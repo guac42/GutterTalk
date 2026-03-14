@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">GutterTalk</string>
+
+    <!-- menu -->
+    <string name="menu_back_desc">Back</string>
+
+    <!-- login -->
+    <string name="login_screen_title">Login</string>
+    <string name="login_login_button">Login</string>
+    <string name="login_login_loading">Logging in…</string>
+    <string name="login_guest_button">Guest</string>
+    <string name="login_create_button">Create User</string>
+    <string name="login_username_field">Username</string>
+    <string name="login_password_field">Password</string>
+    <string name="login_failed">Login Failed</string>
+    <string name="login_create_user">Create user selected</string>
+
+    <!-- settings -->
+    <string name="settings_screen_title">Settings</string>
+
+    <!-- lane -->
+    <string name="lane_screen_title">Bowling Lane</string>
+
+    <!-- leaderboard -->
+    <string name="leaderboard_screen_title">LeaderBoards</string>
+
+    <!-- scores -->
+    <string name="scores_screen_title">Top Scores</string>
+</resources>
