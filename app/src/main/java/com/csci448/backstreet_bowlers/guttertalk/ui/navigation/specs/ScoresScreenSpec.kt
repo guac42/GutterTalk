@@ -11,7 +11,7 @@ import com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.scores.GutterTal
 object ScoresScreenSpec : IScreenSpec {
     private const val LOG_TAG = "448.ScoresScreenSpec"
 
-    override val route = "main"
+    override val route = "scores"
     override val arguments: List<NamedNavArgument> = emptyList()
     override val title = R.string.scores_screen_title
     override fun buildRoute(vararg args: String?) = route
