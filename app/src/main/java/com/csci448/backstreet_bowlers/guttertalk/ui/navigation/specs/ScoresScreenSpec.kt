@@ -6,7 +6,9 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.csci448.backstreet_bowlers.guttertalk.R
+import com.csci448.backstreet_bowlers.guttertalk.data.BowlingScore
 import com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.scores.GutterTalkScoresScreen
+import java.util.UUID
 
 object ScoresScreenSpec : IScreenSpec {
     private const val LOG_TAG = "448.ScoresScreenSpec"
@@ -23,7 +25,8 @@ object ScoresScreenSpec : IScreenSpec {
         navBackStackEntry: NavBackStackEntry
     ) {
         GutterTalkScoresScreen(
-            modifier = modifier
+            modifier = modifier,
+            scoreCard = BowlingScore(id = UUID.randomUUID(), rolls = listOf(), scores = listOf()) //TODO: Replace with real data
         )
     }
 
