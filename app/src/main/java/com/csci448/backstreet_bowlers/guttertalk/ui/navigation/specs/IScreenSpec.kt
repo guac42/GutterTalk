@@ -64,7 +64,7 @@ sealed interface IScreenSpec {
             navigationIcon = if (navController.previousBackStackEntry != null) {
                 {
                     IconButton(
-                        onClick = { navController.navigate(LoginScreenSpec.route) }) {
+                        onClick = { navController.popBackStack() }) {
                         Image(
                             painter = painterResource(id = R.drawable.arrow_back),
                             contentDescription = stringResource(id = R.string.menu_back_desc)
