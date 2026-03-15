@@ -23,7 +23,10 @@ data object SettingsScreenSpec : IScreenSpec {
         navBackStackEntry: NavBackStackEntry
     ) {
         GutterTalkSettingsScreen(
-            modifier = modifier
+            modifier = modifier,
+            onToggleMusicClick = {},
+            onMusicSliderClick = {},
+            onToggleInsultClick = {}
         )
     }
 

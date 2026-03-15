@@ -23,7 +23,17 @@ data object MainScreenSpec : IScreenSpec {
         navBackStackEntry: NavBackStackEntry
     ) {
         GutterTalkMainScreen(
-            modifier = modifier
+            modifier = modifier,
+            onPlayClick = {
+                navController.navigate(LaneScreenSpec.route)
+            },
+            onLeaderBoardClick = {
+                navController.navigate(LeaderboardScreenSpec.route)
+            },
+            onSettingsClick = {
+                navController.navigate(SettingsScreenSpec.route)
+            }
+
         )
     }
 

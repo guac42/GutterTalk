@@ -26,4 +26,15 @@
 
     <!-- scores -->
     <string name="scores_screen_title">Top Scores</string>
+
+    <!-- main -->
+    <string name="main_play_button">Play</string>
+    <string name="main_leaderboard_button">Leaderboard</string>
+    <string name="main_settings_button">Settings</string>
+
+    <!-- settings -->
+    <string name="settings_toggle_music_button">Toggle Music</string>
+    <string name="settings_music_slider_button">Music Slider</string>
+    <string name="settings_toggle_insults_button">Toggle Insults</string>
+
 </resources>
