@@ -23,7 +23,7 @@
 
     <!-- leaderboard -->
     <string name="leaderboard_screen_title">LeaderBoards</string>
-    <string name="leaderboard_screen_user_scores">User Scores</string>
+    <string name="leaderboard_screen_scores">User Scores</string>
     <string name="leaderboard_screen_local">Local Leaderboard</string>
     <string name="leaderboard_screen_global">Global Leaderboard</string>
 

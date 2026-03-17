@@ -1,19 +1,15 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.csci448.backstreet_bowlers.guttertalk.R
@@ -50,21 +45,12 @@ fun GutterTalkScoresScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ){
-        Box(
-            modifier = Modifier.padding(2.dp).weight(.3f),
-            contentAlignment = Alignment.Center // Centers children both vertically and horizontally
-        ) {
-            Text(
-                text= stringResource(R.string.scores_screen_title),
-                style = MaterialTheme.typography.titleLarge
-            )
-        }
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(8.dp).weight(.7f),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+            verticalArrangement = Arrangement.Center
         ) {
 //         Title Card
             // Headers for the table
@@ -74,7 +60,6 @@ fun GutterTalkScoresScreen(
             GutterTalkSingleRow(scoreCard2, R.string.scores_screen_rank_1, modifier)
             GutterTalkSingleRow(BowlingScore(id=UUID.randomUUID()), R.string.scores_screen_rank_2, modifier)
             GutterTalkSingleRow(BowlingScore(id=UUID.randomUUID()), R.string.scores_screen_rank_3, modifier)
-
         }
     }
 }
@@ -90,7 +75,7 @@ fun GutterTalkSingleRow(scoreCard: BowlingScore, rankTag:Int, modifier: Modifier
                 .height(IntrinsicSize.Max)
         ){
             Card(
-                modifier=Modifier.weight(0.15f).padding(2.dp),
+                modifier=Modifier.weight(0.17f).padding(2.dp),
                 shape = RectangleShape,
                 border = BorderStroke(1.dp, Color.White),
 
