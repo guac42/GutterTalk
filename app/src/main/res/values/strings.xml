@@ -27,9 +27,6 @@
     <string name="leaderboard_screen_local">Local Leaderboard</string>
     <string name="leaderboard_screen_global">Global Leaderboard</string>
 
-
-
-
     <!-- scores -->
     <string name="scores_screen_title">Top Scores</string>
     <string name="scores_screen_header_1">Game Number</string>
@@ -48,5 +45,4 @@
     <string name="settings_toggle_music_button">Toggle Music</string>
     <string name="settings_music_slider_button">Music Slider</string>
     <string name="settings_toggle_insults_button">Toggle Insults</string>
-
 </resources>

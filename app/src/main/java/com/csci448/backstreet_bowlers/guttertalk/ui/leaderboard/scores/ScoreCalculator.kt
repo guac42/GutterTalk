@@ -1,6 +1,5 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.scores
 
-import android.util.Log.i
 import com.csci448.backstreet_bowlers.guttertalk.data.BowlingScore
 
 /**
