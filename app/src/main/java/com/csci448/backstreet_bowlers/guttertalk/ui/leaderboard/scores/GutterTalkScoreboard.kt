@@ -1,17 +1,11 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.scores
 
-import android.R.attr.text
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,11 +25,11 @@ import java.util.UUID
  * @param scoreCard has all the data about a specific game (BowlingScore)
  */
 @Composable
-fun GutterTalkScoresScreen(
+fun GutterTalkScoreboard(
     modifier: Modifier = Modifier,
     scoreCard: BowlingScore
 ) {
-    Row(modifier = modifier){
+    Row(modifier = modifier.padding(1.dp).height(IntrinsicSize.Max)){
         if(scoreCard.frameNumber != null) {
                 for (frame in 1..9) {
                     var index = (frame-1)*2
@@ -159,7 +153,7 @@ fun SingleFrame(modifier: Modifier, score1: Int?, score2: Int?, score:Int?, scor
 @Composable
 fun EmptyGutterTalkScoreboardScreenPreview() {
     var scoreCard = BowlingScore(id= UUID.randomUUID())
-    GutterTalkScoresScreen(scoreCard = scoreCard)
+    GutterTalkScoreboard(scoreCard = scoreCard)
 }
 
 @Preview
@@ -172,20 +166,20 @@ fun GutterTalkScoreboardScreenPreview() {
         scores += (ScoreCalculator(scoreCard, i))
     }
     var scoreCard2 = BowlingScore(id= UUID.randomUUID(), rolls = rolls, scores = scores)
-    GutterTalkScoresScreen(scoreCard = scoreCard2)
+    GutterTalkScoreboard(scoreCard = scoreCard2)
 }
 
 @Preview
 @Composable
 fun GutterTalkScoreboardScreenInProgressPreview() {
-    var rolls: List<Int?> = listOf(10, 0, 10, 0, 7, 3, 7, 2, 4, 5, 9, 1, 0, 10, 10, null, null, null, null, null, null)
+    var rolls: List<Int?> = listOf(10, 0, 10, 0, 7, 3, 7, 2, 4, 5, 9, 1, 0, 10, 10, 0, 10, null, null, null, null)
     var scoreCard = BowlingScore(id= UUID.randomUUID(), rolls = rolls)
     var scores: List<Int?> = listOf()
     for(i in 1..10){
         scores += (ScoreCalculator(scoreCard, i))
     }
     var scoreCard2 = BowlingScore(id= UUID.randomUUID(), rolls = rolls, scores = scores)
-    GutterTalkScoresScreen(scoreCard = scoreCard2)
+    GutterTalkScoreboard(scoreCard = scoreCard2)
 }
 
 @Preview

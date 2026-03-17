@@ -23,7 +23,12 @@ object LeaderboardScreenSpec : IScreenSpec {
         navBackStackEntry: NavBackStackEntry
     ) {
         GutterTalkLeaderboardScreen(
-            modifier = modifier
+            modifier = modifier,
+            onUserScoresClick = {
+                navController.navigate(ScoresScreenSpec.route)
+            },
+            onLocalLeaderboardClick = {}, // For the future, optional screen
+            onGlobalLeaderboardClick = {} // For the future, optional screen
         )
     }
 

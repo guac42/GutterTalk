@@ -23,9 +23,21 @@
 
     <!-- leaderboard -->
     <string name="leaderboard_screen_title">LeaderBoards</string>
+    <string name="leaderboard_screen_user_scores">User Scores</string>
+    <string name="leaderboard_screen_local">Local Leaderboard</string>
+    <string name="leaderboard_screen_global">Global Leaderboard</string>
+
+
+
 
     <!-- scores -->
     <string name="scores_screen_title">Top Scores</string>
+    <string name="scores_screen_header_1">Game Number</string>
+    <string name="scores_screen_header_2">Score Card</string>
+    <string name="scores_screen_recent_game">Recent Game</string>
+    <string name="scores_screen_rank_1">Rank #1</string>
+    <string name="scores_screen_rank_2">Rank #2</string>
+    <string name="scores_screen_rank_3">Rank #3</string>
 
     <!-- main -->
     <string name="main_play_button">Play</string>

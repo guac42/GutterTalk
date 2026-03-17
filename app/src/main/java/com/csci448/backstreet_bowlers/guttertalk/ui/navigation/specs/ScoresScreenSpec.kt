@@ -7,7 +7,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.csci448.backstreet_bowlers.guttertalk.R
 import com.csci448.backstreet_bowlers.guttertalk.data.BowlingScore
-import com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.scores.GutterTalkScoresScreen
+import com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.GutterTalkScoresScreen
 import java.util.UUID
 
 object ScoresScreenSpec : IScreenSpec {
@@ -26,7 +26,6 @@ object ScoresScreenSpec : IScreenSpec {
     ) {
         GutterTalkScoresScreen(
             modifier = modifier,
-            scoreCard = BowlingScore(id = UUID.randomUUID(), rolls = listOf(), scores = listOf()) //TODO: Replace with real data
         )
     }
 
