@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "185363534595",
+    "project_id": "guttertalk-d1efc",
+    "storage_bucket": "guttertalk-d1efc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:185363534595:android:2ebb3c97899a60d6dd4f36",
+        "android_client_info": {
+          "package_name": "com.csci448.backstreet_bowlers.guttertalk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTcDNOii8TkJV8CwEwwJSWIL87YhJDdbc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

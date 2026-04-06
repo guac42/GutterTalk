@@ -36,7 +36,7 @@ internal constructor(
     override val effectFlow: SharedFlow<LoginEffect?> = _effectFlow.asSharedFlow()
 
     override fun handleIntent(intent: LoginIntent) {
-        when(intent) {
+        when (intent) {
             is LoginIntent.NewUsernameString -> {
                 Log.d(LOG_TAG, "Handling update username string")
                 _stateFlow.update { state ->
@@ -46,6 +46,7 @@ internal constructor(
                     _savedState
                 }
             }
+
             is LoginIntent.NewPasswordString -> {
                 Log.d(LOG_TAG, "Handling update password string")
                 _stateFlow.update { state ->
@@ -55,31 +56,85 @@ internal constructor(
                     _savedState
                 }
             }
+
             is LoginIntent.Login -> {
                 Log.d(LOG_TAG, "Handling login intent")
                 _stateFlow.update { state ->
-                    _savedState = state.copy(
-                        loading = true
-                    )
+                    _savedState = state.copy(loading = true)
                     _savedState
                 }
                 viewModelScope.launch {
-                    // Simulate tasks
-                    delay(2000L)
-                    _stateFlow.update { state ->
-                        _savedState = state.copy(
-                            loading = false,
-                            username = "",
-                            password = ""
+                    com.google.firebase.auth.FirebaseAuth.getInstance()
+                        .signInWithEmailAndPassword(
+                            _stateFlow.value.username,
+                            _stateFlow.value.password
                         )
-                        _savedState
-                    }
-                    _effectFlow.update { LoginEffect.LoginSucceeded }
+                        .addOnSuccessListener {
+                            Log.d(LOG_TAG, "Firebase login succeeded")
+                            _stateFlow.update { state ->
+                                _savedState = state.copy(
+                                    loading = false,
+                                    username = "",
+                                    password = ""
+                                )
+                                _savedState
+                            }
+                            _effectFlow.update { LoginEffect.LoginSucceeded }
+                        }
+                        .addOnFailureListener {
+                            Log.d(LOG_TAG, "Firebase login failed: ${it.message}")
+                            _stateFlow.update { state ->
+                                _savedState = state.copy(loading = false)
+                                _savedState
+                            }
+                            _effectFlow.update { LoginEffect.LoginFailed }
+                        }
+
+
+                }
+            }
+
+            is LoginIntent.CreateUser -> {
+                Log.d(LOG_TAG, "Handling create user intent")
+                _stateFlow.update { state ->
+                    _savedState = state.copy(loading = true)
+                    _savedState
+                }
+                viewModelScope.launch {
+                    com.google.firebase.auth.FirebaseAuth.getInstance()
+                        .createUserWithEmailAndPassword(
+                            _stateFlow.value.username,
+                            _stateFlow.value.password
+                        )
+                        .addOnSuccessListener {
+                            Log.d(LOG_TAG, "Firebase create user succeeded")
+                            _stateFlow.update { state ->
+                                _savedState = state.copy(
+                                    loading = false,
+                                    username = "",
+                                    password = ""
+                                )
+                                _savedState
+                            }
+                            _effectFlow.update { LoginEffect.LoginSucceeded }
+                        }
+                        .addOnFailureListener {
+                            Log.d(LOG_TAG, "Firebase create user failed: ${it.message}")
+                            _stateFlow.update { state ->
+                                _savedState = state.copy(loading = false)
+                                _savedState
+                            }
+                            _effectFlow.update { LoginEffect.LoginFailed }
+                        }
                 }
             }
             is LoginIntent.Clear -> {
                 _effectFlow.update { null }
             }
         }
+
+
     }
 }
+
+
