@@ -70,7 +70,7 @@ data object LoginScreenSpec : IScreenSpec {
                 if (state.username.isNotBlank() && state.password.isNotBlank()) {
                     dispatcher.invoke(LoginIntent.Login)
                 } else {
-                    val toast = Toast.makeText(context, "Email and password cannot be empty", Toast.LENGTH_SHORT)
+                    val toast = Toast.makeText(context, "Email and password cannot be empty", Toast.LENGTH_SHORT).show()
                     toast.show()
                 }
             },
@@ -83,7 +83,7 @@ data object LoginScreenSpec : IScreenSpec {
                 if(state.username.isNotBlank() && state.password.isNotBlank()){
                     dispatcher.invoke(LoginIntent.CreateUser)
                 } else {
-                    val toast = Toast.makeText(context, "Email and password cannot be empty", Toast.LENGTH_SHORT)
+                    val toast = Toast.makeText(context, "Email and password cannot be empty", Toast.LENGTH_SHORT).show()
                 }
             },
             loading = state.loading
