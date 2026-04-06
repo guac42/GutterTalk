@@ -71,7 +71,7 @@ data object LoginScreenSpec : IScreenSpec {
                     dispatcher.invoke(LoginIntent.Login)
                 } else {
                     val toast = Toast.makeText(context, "Email and password cannot be empty", Toast.LENGTH_SHORT).show()
-                    toast.show()
+                    
                 }
             },
             onLoginGuest = {
