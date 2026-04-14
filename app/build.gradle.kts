@@ -37,6 +37,10 @@ android {
     buildFeatures {
         compose = true
     }
+    androidResources {
+        noCompress.add("filamat")
+        noCompress.add("ktx")
+    }
 }
 
 dependencies {
@@ -51,6 +55,7 @@ dependencies {
     implementation(libs.androidx.navigation)
     implementation(libs.kotlin.reflect)
     implementation(libs.coil.compose)
+    implementation(libs.sceneview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

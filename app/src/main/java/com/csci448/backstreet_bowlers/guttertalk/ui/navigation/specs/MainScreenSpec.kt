@@ -25,7 +25,7 @@ data object MainScreenSpec : IScreenSpec {
         GutterTalkMainScreen(
             modifier = modifier,
             onPlayClick = {
-                navController.navigate(LaneScreenSpec.route)
+                navController.navigate(GameScreenSpec.route)
             },
             onLeaderBoardClick = {
                 navController.navigate(LeaderboardScreenSpec.route)

@@ -12,31 +12,33 @@ class GutterTalkViewModelFactory : ViewModelProvider.Factory {
     companion object {
         private const val LOG_TAG = "448.GutterTalkViewModelFactory"
         private val CONTEXT_KEY = object : CreationExtras.Key<Context> {}
-        fun creationExtras(defaultCreationExtras: CreationExtras, context: Context) = MutableCreationExtras(defaultCreationExtras).apply {
-            set(CONTEXT_KEY, context)
-        }
+        fun creationExtras(defaultCreationExtras: CreationExtras, context: Context) =
+            MutableCreationExtras(defaultCreationExtras).apply {
+                set(CONTEXT_KEY, context)
+            }
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(
-        modelClass: Class<T>,
-        extras: CreationExtras
-    ): T =
-        with(modelClass) {
-            when {
-                isAssignableFrom(LoginViewModel::class.java) -> {
-                    Log.d(LOG_TAG, "creating LoginViewModel")
-                    // val context = checkNotNull(extras[CONTEXT_KEY])
-                    val savedStateHandle = extras.createSavedStateHandle()
-                    LoginViewModel(
-                        // SamodelkinRepo.getInstance(context),
-                        savedStateHandle
-                    )
-                }
-                else -> {
-                    Log.e(LOG_TAG, "Unknown ViewModel: $modelClass")
-                    throw IllegalArgumentException("Unknown ViewModel")
-                }
+        modelClass: Class<T>, extras: CreationExtras
+    ): T = with(modelClass) {
+        when {
+            isAssignableFrom(LoginViewModel::class.java) -> {
+                Log.d(LOG_TAG, "creating LoginViewModel")
+                val savedStateHandle = extras.createSavedStateHandle()
+                LoginViewModel(savedStateHandle)
             }
-        } as T
+
+            isAssignableFrom(GameViewModel::class.java) -> {
+                Log.d(LOG_TAG, "creating GameViewModel")
+                val savedStateHandle = extras.createSavedStateHandle()
+                GameViewModel(savedStateHandle)
+            }
+
+            else -> {
+                Log.e(LOG_TAG, "Unknown ViewModel: $modelClass")
+                throw IllegalArgumentException("Unknown ViewModel: $modelClass")
+            }
+        }
+    } as T
 }
