@@ -35,6 +35,13 @@ class GutterTalkViewModelFactory : ViewModelProvider.Factory {
                 GameViewModel(savedStateHandle)
             }
 
+            isAssignableFrom(SettingsViewModel::class.java) ->{
+                Log.d(LOG_TAG, "creating SettingsViewModel")
+                val savedStateHandle = extras.createSavedStateHandle()
+                val context = extras[CONTEXT_KEY] ?: error("Context required for SettingsViewModel")
+                SettingsViewModel(savedStateHandle, context)
+            }
+
             else -> {
                 Log.e(LOG_TAG, "Unknown ViewModel: $modelClass")
                 throw IllegalArgumentException("Unknown ViewModel: $modelClass")
