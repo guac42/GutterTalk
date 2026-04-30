@@ -152,7 +152,7 @@ fun SingleFrame(modifier: Modifier, score1: Int?, score2: Int?, score:Int?, scor
 @Preview
 @Composable
 fun EmptyGutterTalkScoreboardScreenPreview() {
-    var scoreCard = BowlingScore(id= UUID.randomUUID())
+    var scoreCard = BowlingScore(id= UUID.randomUUID().toString())
     GutterTalkScoreboard(scoreCard = scoreCard)
 }
 
@@ -160,12 +160,12 @@ fun EmptyGutterTalkScoreboardScreenPreview() {
 @Composable
 fun GutterTalkScoreboardScreenPreview() {
     var rolls: List<Int?> = listOf(10, 0, 10, 0, 7, 3, 7, 2, 4, 5, 9, 1, 0, 10, 10, 0, 10, 0, 5, 5, 8)
-    var scoreCard = BowlingScore(id= UUID.randomUUID(), rolls = rolls)
+    var scoreCard = BowlingScore(id= UUID.randomUUID().toString(), rolls = rolls)
     var scores: List<Int?> = listOf()
     for(i in 1..10){
         scores += (ScoreCalculator(scoreCard, i))
     }
-    var scoreCard2 = BowlingScore(id= UUID.randomUUID(), rolls = rolls, scores = scores)
+    var scoreCard2 = BowlingScore(id= UUID.randomUUID().toString(), rolls = rolls, scores = scores)
     GutterTalkScoreboard(scoreCard = scoreCard2)
 }
 
@@ -173,12 +173,12 @@ fun GutterTalkScoreboardScreenPreview() {
 @Composable
 fun GutterTalkScoreboardScreenInProgressPreview() {
     var rolls: List<Int?> = listOf(10, 0, 10, 0, 7, 3, 7, 2, 4, 5, 9, 1, 0, 10, 10, 0, 10, null, null, null, null)
-    var scoreCard = BowlingScore(id= UUID.randomUUID(), rolls = rolls)
+    var scoreCard = BowlingScore(id= UUID.randomUUID().toString(), rolls = rolls)
     var scores: List<Int?> = listOf()
     for(i in 1..10){
         scores += (ScoreCalculator(scoreCard, i))
     }
-    var scoreCard2 = BowlingScore(id= UUID.randomUUID(), rolls = rolls, scores = scores)
+    var scoreCard2 = BowlingScore(id= UUID.randomUUID().toString(), rolls = rolls, scores = scores)
     GutterTalkScoreboard(scoreCard = scoreCard2)
 }
 

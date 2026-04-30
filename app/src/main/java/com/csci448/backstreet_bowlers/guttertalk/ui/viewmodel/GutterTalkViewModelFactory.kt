@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.MutableCreationExtras
+import com.csci448.backstreet_bowlers.guttertalk.data.BowlingScoreRepository
+import com.csci448.backstreet_bowlers.guttertalk.data.UserRepository
 
 class GutterTalkViewModelFactory : ViewModelProvider.Factory {
     companion object {
@@ -40,6 +42,14 @@ class GutterTalkViewModelFactory : ViewModelProvider.Factory {
                 val savedStateHandle = extras.createSavedStateHandle()
                 val context = extras[CONTEXT_KEY] ?: error("Context required for SettingsViewModel")
                 SettingsViewModel(savedStateHandle, context)
+            }
+
+            isAssignableFrom(ScoresViewModel::class.java) -> {
+                Log.d(LOG_TAG, "creating ScoresViewModel")
+                ScoresViewModel(
+                    userRepository = UserRepository(),
+                    scoreRepository = BowlingScoreRepository()
+                )
             }
 
             else -> {
