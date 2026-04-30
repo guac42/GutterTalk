@@ -32,11 +32,12 @@ data object SettingsScreenSpec : IScreenSpec {
         navBackStackEntry: NavBackStackEntry
     ) {
         val context = LocalContext.current
+        val activity = context as androidx.activity.ComponentActivity
         val viewModel: SettingsViewModel = viewModel(
-            viewModelStoreOwner = navBackStackEntry,
+            viewModelStoreOwner = activity,
             factory = GutterTalkViewModelFactory(),
             extras = GutterTalkViewModelFactory.creationExtras(
-                navBackStackEntry.defaultViewModelCreationExtras,
+                activity.defaultViewModelCreationExtras,
                 context
             )
         )
@@ -62,3 +63,6 @@ data object SettingsScreenSpec : IScreenSpec {
         navBackStackEntry: NavBackStackEntry?
     ) { }
 }
+
+
+

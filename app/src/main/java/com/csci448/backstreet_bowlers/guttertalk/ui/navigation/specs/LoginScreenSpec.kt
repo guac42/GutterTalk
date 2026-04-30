@@ -55,9 +55,27 @@ data object LoginScreenSpec : IScreenSpec {
                     val toast = Toast.makeText(context, R.string.login_failed, Toast.LENGTH_SHORT)
                     toast.show()
                 }
+                LoginEffect.VerificationEmailSent -> {
+                    Log.d(LOG_TAG, "Handling verification email sent ")
+                    dispatcher.invoke(LoginIntent.Clear)
+                    val toast = Toast.makeText(context, "Verification email sent! Please check your inbox.",
+                        Toast.LENGTH_LONG)
+                    toast.show()
+                }
+                LoginEffect.EmailNotVerified -> {
+                    Log.d(LOG_TAG, "Handling email not verified")
+                    val toast = Toast.makeText(context, "Please verify your email before logging in.", Toast.LENGTH_LONG)
+                    toast.show()
+                }
+
                 null -> {}
             }
+
+
         }
+
+
+
 
         GutterTalkLoginScreen(
             modifier = modifier,

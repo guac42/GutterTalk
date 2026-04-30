@@ -79,7 +79,13 @@ internal constructor(
                                 )
                                 _savedState
                             }
-                            _effectFlow.update { LoginEffect.LoginSucceeded }
+                            if (it.user?.isEmailVerified == true) {
+                                Log.d(LOG_TAG, "Email verified, login succeeded")
+                                _effectFlow.update { LoginEffect.LoginSucceeded }
+                            } else {
+                                Log.d(LOG_TAG, "Email not verified")
+                                _effectFlow.update { LoginEffect.EmailNotVerified }
+                            }
                         }
                         .addOnFailureListener {
                             Log.d(LOG_TAG, "Firebase login failed: ${it.message}")
@@ -93,6 +99,10 @@ internal constructor(
 
                 }
             }
+
+
+
+
 
             is LoginIntent.CreateUser -> {
                 Log.d(LOG_TAG, "Handling create user intent")
@@ -108,6 +118,8 @@ internal constructor(
                         )
                         .addOnSuccessListener {
                             Log.d(LOG_TAG, "Firebase create user succeeded")
+                            it.user?.sendEmailVerification()
+                            Log.d(LOG_TAG, "Verification email sent")
                             _stateFlow.update { state ->
                                 _savedState = state.copy(
                                     loading = false,
@@ -116,8 +128,12 @@ internal constructor(
                                 )
                                 _savedState
                             }
-                            _effectFlow.update { LoginEffect.LoginSucceeded }
+                            _effectFlow.update { LoginEffect.VerificationEmailSent }
                         }
+
+
+
+
                         .addOnFailureListener {
                             Log.d(LOG_TAG, "Firebase create user failed: ${it.message}")
                             _stateFlow.update { state ->
