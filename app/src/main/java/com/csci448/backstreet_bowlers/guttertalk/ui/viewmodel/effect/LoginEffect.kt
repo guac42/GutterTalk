@@ -5,11 +5,6 @@ sealed class LoginEffect : GutterTalkEffect() {
     object LoginFailed : LoginEffect()
     object VerificationEmailSent: LoginEffect()
     object EmailNotVerified: LoginEffect()
-
-
-
-
-
 }
 
 

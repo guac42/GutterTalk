@@ -11,8 +11,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GameState(
     val ballInMotion: Boolean    = false,
-    val aimAngle: Float          = 0f,
-    val throwPower: Float        = 0.5f,
     val knockedPins: Int         = 0,
     val frameScores: List<Int>   = emptyList(),
     val currentFrame: Int        = 1,

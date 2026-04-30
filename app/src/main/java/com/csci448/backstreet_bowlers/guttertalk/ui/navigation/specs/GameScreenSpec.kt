@@ -13,6 +13,7 @@ import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.GameViewModel
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.GutterTalkViewModelFactory
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.collectInLaunchedEffect
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.effect.GameEffect
+import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.intent.GameIntent
 
 object GameScreenSpec : IScreenSpec {
     private const val LOG_TAG = "448.LaneScreenSpec"
@@ -49,7 +50,10 @@ object GameScreenSpec : IScreenSpec {
         }
 
         GutterTalkLaneScreen(
-            modifier = modifier
+            modifier = modifier,
+            onBallSettled = {
+                dispatcher.invoke(GameIntent.BallSettled(it))
+            }
         )
     }
 

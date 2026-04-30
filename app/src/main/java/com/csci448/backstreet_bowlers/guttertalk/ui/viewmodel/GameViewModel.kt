@@ -34,10 +34,14 @@ internal constructor(
 
     override fun handleIntent(intent: GameIntent) {
         when (intent) {
-            is GameIntent.AimBall -> {}
-            is GameIntent.SetPower -> {}
             is GameIntent.ThrowBall -> {}
-            is GameIntent.BallSettled -> {}
+            is GameIntent.BallSettled -> {
+                if (intent.pinsHit == null) {
+                    Log.d(LOG_TAG, "Received BallSettled intent for gutter ball!")
+                } else {
+                    Log.d(LOG_TAG, "Received BallSettled intent with ${intent.pinsHit.size} pins hit")
+                }
+            }
             is GameIntent.ResetPins -> {}
         }
     }

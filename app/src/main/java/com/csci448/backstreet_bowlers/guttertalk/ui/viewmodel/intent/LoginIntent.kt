@@ -6,5 +6,4 @@ sealed class LoginIntent : GutterTalkIntent() {
     object Login : LoginIntent()
     object CreateUser: LoginIntent()
     object Clear : LoginIntent()
-
 }

@@ -1,17 +1,23 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.game
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import io.github.sceneview.SceneView
 import io.github.sceneview.math.Position
 import io.github.sceneview.math.Size
@@ -19,27 +25,18 @@ import io.github.sceneview.rememberCameraManipulator
 import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberEnvironmentLoader
 import io.github.sceneview.rememberMaterialLoader
-import io.github.sceneview.rememberModelInstance
 import io.github.sceneview.rememberModelLoader
 
 @Composable
 fun GutterTalkLaneScreen(
     modifier: Modifier = Modifier,
+    onBallSettled: (Set<Int>?) -> Unit,
 ) {
     val engine = rememberEngine()
     val materialLoader = rememberMaterialLoader(engine)
     val modelLoader = rememberModelLoader(engine)
     val environmentLoader = rememberEnvironmentLoader(engine)
     val cameraManipulator = rememberCameraManipulator()
-    // val modelInstance = rememberModelInstance(modelLoader, "models/bowling_ball.glb")
-
-    /*val infiniteTransition = rememberInfiniteTransition(label = "rotation")
-    val rotationY by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(tween(durationMillis = 20_000, easing = LinearEasing)),
-        label = "rotationY"
-    )*/
 
     val greenMaterial =
         remember(materialLoader) { materialLoader.createColorInstance(Color(0xFF4CAF50)) }
@@ -64,18 +61,84 @@ fun GutterTalkLaneScreen(
                 size = Size(1f, 0.1f, 1f),
                 position = Position(y = -0.11f)
             )
-            /*modelInstance?.let {
-                ModelNode(
-                    modelInstance = it,
-                    scaleToUnits = 1.0f,
-                    position = Position(x = 1.0f),
-                    rotation = Rotation(y = rotationY)
-                )
-            }
+        }
 
-            if (modelInstance == null) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }*/
+        Surface(
+            tonalElevation = 2.dp,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("Controls", style = MaterialTheme.typography.titleMedium)
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Button(onClick = { }) {
+                            Text("Gutter")
+                        }
+                        Button(onClick = { }) {
+                            Text("Miss")
+                        }
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Button(onClick = { }) {
+                            Text("3 pins")
+                        }
+                        Button(onClick = { }) {
+                            Text("Strike")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun GutterTalkLaneControlsPreview() {
+    Surface(
+        tonalElevation = 2.dp,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+        ) {
+            Text("Controls", style = MaterialTheme.typography.titleMedium)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Button(onClick = { }) {
+                        Text("Gutter")
+                    }
+                    Button(onClick = { }) {
+                        Text("Miss")
+                    }
+                }
+                Row(
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Button(onClick = { }) {
+                        Text("3 pins")
+                    }
+                    Button(onClick = { }) {
+                        Text("Strike")
+                    }
+                }
+            }
         }
     }
 }
