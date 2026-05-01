@@ -34,7 +34,7 @@ fun GutterTalkSettingsScreen(
     musicVolume: Float,
     onToggleMusicClick: (Boolean) -> Unit,
     onMusicVolumeChange: (Float) -> Unit,
-    onToggleInsultClick: () -> Unit
+    onToggleInsultClick: (Boolean) -> Unit
 ) {
         var showMusicDialog by remember { mutableStateOf(false) }
         if (showMusicDialog) {
@@ -56,6 +56,26 @@ fun GutterTalkSettingsScreen(
                 }
             )
         }
+    var showInsultsDialog by remember { mutableStateOf(false) }
+    if (showInsultsDialog) {
+        AlertDialog(
+            onDismissRequest = { showInsultsDialog = false },
+            title = { Text("Insults") },
+            text = { Text("Turn insults on or off?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    onToggleInsultClick(true)
+                    showInsultsDialog = false
+                }) { Text("Insults On") }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    onToggleInsultClick(false)
+                    showInsultsDialog = false
+                }) { Text("Insults Off") }
+            }
+        )
+    }
 
 
     Column(
@@ -80,7 +100,7 @@ fun GutterTalkSettingsScreen(
         )
         GutterTalkButton(
             text = stringResource(R.string.settings_toggle_insults_button),
-            onClick = onToggleInsultClick
+            onClick = {showInsultsDialog = true}
         )
 
     }
@@ -95,6 +115,6 @@ fun GutterTalkSettingsScreenPreview() {
         musicVolume = 0.5f,
         onToggleMusicClick = {},
         onMusicVolumeChange = {},
-        onToggleInsultClick = {}
+        onToggleInsultClick = {_ ->}
     )
 }

@@ -1,5 +1,6 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.game
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,12 +27,15 @@ import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberEnvironmentLoader
 import io.github.sceneview.rememberMaterialLoader
 import io.github.sceneview.rememberModelLoader
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun GutterTalkLaneScreen(
     modifier: Modifier = Modifier,
     onBallSettled: (Set<Int>?) -> Unit,
+    isInsultsOn: Boolean
 ) {
+    val context = LocalContext.current
     val engine = rememberEngine()
     val materialLoader = rememberMaterialLoader(engine)
     val modelLoader = rememberModelLoader(engine)
@@ -77,10 +81,20 @@ fun GutterTalkLaneScreen(
                         horizontalArrangement = Arrangement.SpaceAround,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Button(onClick = { }) {
+                        Button(onClick = {
+                            if (isInsultsOn) {
+                                Toast.makeText(context, "Did you aim for the pins, or are you just testing the durability of the gutters?",
+                                    Toast.LENGTH_SHORT).show()
+                            }
+                        }) {
                             Text("Gutter")
                         }
-                        Button(onClick = { }) {
+                        Button(onClick = {
+                            if (isInsultsOn) {
+                                Toast.makeText(context, "Back to our regular scheduled program...",
+                                    Toast.LENGTH_SHORT).show()
+                            }
+                        }) {
                             Text("Miss")
                         }
                     }
@@ -88,10 +102,20 @@ fun GutterTalkLaneScreen(
                         horizontalArrangement = Arrangement.SpaceAround,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Button(onClick = { }) {
+                        Button(onClick = {
+                            if (isInsultsOn) {
+                                Toast.makeText(context, "I guess you took the whole some is better than none to heart huh?",
+                                    Toast.LENGTH_SHORT).show()
+                            }
+                        }) {
                             Text("3 pins")
                         }
-                        Button(onClick = { }) {
+                        Button(onClick = {
+                            if (isInsultsOn) {
+                                Toast.makeText(context, "Wow, even a broken clock gets it right twice a day.",
+                                    Toast.LENGTH_LONG).show()
+                            }
+                        }) {
                             Text("Strike")
                         }
                     }

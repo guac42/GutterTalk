@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
@@ -11,9 +12,12 @@ import com.csci448.backstreet_bowlers.guttertalk.R
 import com.csci448.backstreet_bowlers.guttertalk.ui.game.GutterTalkLaneScreen
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.GameViewModel
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.GutterTalkViewModelFactory
+import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.SettingsViewModel
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.collectInLaunchedEffect
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.effect.GameEffect
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.intent.GameIntent
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 object GameScreenSpec : IScreenSpec {
     private const val LOG_TAG = "448.LaneScreenSpec"
@@ -30,6 +34,16 @@ object GameScreenSpec : IScreenSpec {
         navBackStackEntry: NavBackStackEntry
     ) {
         val context = LocalContext.current
+        val activity = context as androidx.activity.ComponentActivity
+        val settingsViewModel: SettingsViewModel = viewModel(
+            viewModelStoreOwner = activity,
+            factory = GutterTalkViewModelFactory(),
+            extras = GutterTalkViewModelFactory.creationExtras(
+                activity.defaultViewModelCreationExtras,
+                context
+            )
+        )
+        val settingsState by settingsViewModel.stateFlow.collectAsState()
 
         val viewModel = ViewModelProvider(
             store = navBackStackEntry.viewModelStore,
@@ -51,10 +65,12 @@ object GameScreenSpec : IScreenSpec {
 
         GutterTalkLaneScreen(
             modifier = modifier,
+            isInsultsOn = settingsState.isInsultsOn,
             onBallSettled = {
                 dispatcher.invoke(GameIntent.BallSettled(it))
             }
         )
+
     }
 
     @Composable

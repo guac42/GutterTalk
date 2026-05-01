@@ -6,7 +6,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.csci448.backstreet_bowlers.guttertalk.R
 import com.csci448.backstreet_bowlers.guttertalk.ui.settings.GutterTalkSettingsScreen
-
+import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.intent.SettingsIntent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 
@@ -15,7 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.GutterTalkViewModelFactory
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.SettingsViewModel
-import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.intent.SettingsIntent
+
 
 data object SettingsScreenSpec : IScreenSpec {
     private const val LOG_TAG = "448.SettingsScreenSpec"
@@ -53,7 +53,9 @@ data object SettingsScreenSpec : IScreenSpec {
             onMusicVolumeChange = { volume ->
                 viewModel.handleIntent(SettingsIntent.SetMusicVolume(volume))
             },
-            onToggleInsultClick = {}
+            onToggleInsultClick = { enabled ->
+                viewModel.handleIntent(SettingsIntent.SetInsultsEnabled(enabled))
+            }
         )
     }
 

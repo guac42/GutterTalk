@@ -61,6 +61,13 @@ class SettingsViewModel
                 }
                 mediaPlayer.setVolume(intent.volume, intent.volume)
             }
+            is SettingsIntent.SetInsultsEnabled ->{
+                Log.d(LOG_TAG, "Setting insults enabled: ${intent.enabled}")
+                _stateFlow.update { state ->
+                    _savedState = state.copy(isInsultsOn = intent.enabled)
+                    _savedState
+                }
+            }
         }
 
     }

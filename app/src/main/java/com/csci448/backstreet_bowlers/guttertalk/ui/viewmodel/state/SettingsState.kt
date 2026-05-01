@@ -5,5 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SettingsState(
     val isMusicOn: Boolean = false,
-    val musicVolume: Float = 0.5f
+    val musicVolume: Float = 0.5f,
+    val isInsultsOn: Boolean = true
+
 ) : GutterTalkState
