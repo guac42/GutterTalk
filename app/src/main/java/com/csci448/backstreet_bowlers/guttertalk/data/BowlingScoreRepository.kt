@@ -27,7 +27,7 @@ class BowlingScoreRepository(
     fun getUserScores(userId: String): Flow<List<BowlingScore>> = flow {
         Log.d("BowlingScoreRepository", "Fetching user scores for user ID: $userId")
         val snapshot = scoresCollection
-            .whereEqualTo("PlayerID", "tempID")
+            .whereEqualTo("PlayerID", userId)
             .get()
             .await()
 
