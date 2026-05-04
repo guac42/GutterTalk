@@ -1,22 +1,19 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.navigation.specs
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.csci448.backstreet_bowlers.guttertalk.R
-import com.csci448.backstreet_bowlers.guttertalk.data.BowlingScore
 import com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.GutterTalkScoresScreen
-import java.util.UUID
 
-object ScoresScreenSpec : IScreenSpec {
+object LocalLeaderboardSpec : IScreenSpec {
     private const val LOG_TAG = "448.ScoresScreenSpec"
 
-    override val route = "scores"
+    override val route = "local"
     override val arguments: List<NamedNavArgument> = emptyList()
-    override val title = R.string.scores_screen_title
+    override val title = R.string.leaderboard_screen_local
     override fun buildRoute(vararg args: String?) = route
 
     @Composable
@@ -25,9 +22,8 @@ object ScoresScreenSpec : IScreenSpec {
         navController: NavHostController,
         navBackStackEntry: NavBackStackEntry
     ) {
-        Log.d(LOG_TAG, "Navigating to User Scores Screen")
         GutterTalkScoresScreen(
-            modifier = modifier,
+            modifier = modifier, screen = 2
         )
     }
 

@@ -71,7 +71,7 @@ fun UserScoresComposable(
         )
         Column(
             modifier = Modifier
-                .fillMaxSize()
+//                .fillMaxSize()
                 .padding(8.dp)
                 .weight(.7f),
             horizontalAlignment = Alignment.CenterHorizontally,

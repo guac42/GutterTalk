@@ -44,7 +44,7 @@ class UserRepository(
         }.await()
     }
 
-    fun getTopScores(limit: Long = 10, location: String? = null): Flow<List<UserInformation>> = flow {
+    fun getLeaderboard(limit: Long = 10, location: String? = null): Flow<List<UserInformation>> = flow {
         var query: Query = if (location != null) {
             userCollection.whereEqualTo("location", location)
         } else {

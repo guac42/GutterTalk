@@ -1,5 +1,6 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.navigation.specs
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NamedNavArgument
@@ -25,10 +26,14 @@ object LeaderboardScreenSpec : IScreenSpec {
         GutterTalkLeaderboardScreen(
             modifier = modifier,
             onUserScoresClick = {
+                Log.d(LOG_TAG, "User Scores Callback")
                 navController.navigate(ScoresScreenSpec.route)
             },
-            onLocalLeaderboardClick = {}, // For the future, optional screen
-            onGlobalLeaderboardClick = {} // For the future, optional screen
+            onGlobalLeaderboardClick = {
+                Log.d(LOG_TAG, "Global Leaderboard Callback")
+                navController.navigate(GlobalLeaderboardSpec.route)
+            }, // For the future, optional screen
+            onLocalLeaderboardClick = {} // For the future, optional screen
         )
     }
 

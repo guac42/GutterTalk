@@ -34,7 +34,6 @@ fun GutterTalkLeaderboardScreen(
         GutterTalkButton(
             text = stringResource(R.string.leaderboard_screen_global),
             onClick = onGlobalLeaderboardClick,
-            enabled = false
         )
         GutterTalkButton(
             text = stringResource(R.string.leaderboard_screen_local),
