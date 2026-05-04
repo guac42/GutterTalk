@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.serialization.saved
 import androidx.lifecycle.viewModelScope
+import com.csci448.backstreet_bowlers.guttertalk.data.database.UserRepository
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.effect.LoginEffect
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.intent.LoginIntent
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.state.LoginState
@@ -19,7 +20,8 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel
 internal constructor(
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val userInformationRepository: UserRepository
 ) : ViewModel(), IViewModelContract<LoginState, LoginIntent, LoginEffect> {
     companion object {
         private const val LOG_TAG = "448.LoginViewModel"
@@ -82,8 +84,17 @@ internal constructor(
                             if (it.user?.isEmailVerified == true) {
                                 Log.d(LOG_TAG, "Email verified, login succeeded")
                                 _effectFlow.update { LoginEffect.LoginSucceeded }
+                                // Im pretty sure this is where I would create the users initial user information record
+                                val userId: String
+                                if(it.user?.uid != null){
+                                    userId = it.user?.uid!!
+                                    userInformationRepository.checkUserExists(userId)
+                                }
                             } else {
                                 Log.d(LOG_TAG, "Email not verified")
+                                it.user?.sendEmailVerification()?.addOnCompleteListener{
+                                    Log.d(LOG_TAG, "Verification email resent to user")
+                                }
                                 _effectFlow.update { LoginEffect.EmailNotVerified }
                             }
                         }
@@ -95,8 +106,6 @@ internal constructor(
                             }
                             _effectFlow.update { LoginEffect.LoginFailed }
                         }
-
-
                 }
             }
 

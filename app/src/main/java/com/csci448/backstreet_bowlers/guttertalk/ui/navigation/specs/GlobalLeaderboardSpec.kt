@@ -7,16 +7,14 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.csci448.backstreet_bowlers.guttertalk.R
-import com.csci448.backstreet_bowlers.guttertalk.data.database.BowlingScore
 import com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.GutterTalkScoresScreen
-import java.util.UUID
 
-object ScoresScreenSpec : IScreenSpec {
-    private const val LOG_TAG = "448.ScoresScreenSpec"
+object GlobalLeaderboardSpec : IScreenSpec {
+    private const val LOG_TAG = "448.GlobalScreenSpec"
 
-    override val route = "scores"
+    override val route = "global"
     override val arguments: List<NamedNavArgument> = emptyList()
-    override val title = R.string.scores_screen_title
+    override val title = R.string.leaderboard_screen_global
     override fun buildRoute(vararg args: String?) = route
 
     @Composable
@@ -25,9 +23,12 @@ object ScoresScreenSpec : IScreenSpec {
         navController: NavHostController,
         navBackStackEntry: NavBackStackEntry
     ) {
-        Log.d(LOG_TAG, "Navigating to User Scores Screen")
+        Log.d(LOG_TAG, "Navigating to Global Leaderboard Screen")
+
+
+
         GutterTalkScoresScreen(
-            modifier = modifier,
+            modifier = modifier, screen = 1
         )
     }
 
