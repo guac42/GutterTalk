@@ -84,6 +84,9 @@ internal constructor(
                                 _effectFlow.update { LoginEffect.LoginSucceeded }
                             } else {
                                 Log.d(LOG_TAG, "Email not verified")
+                                it.user?.sendEmailVerification()?.addOnCompleteListener{
+                                    Log.d(LOG_TAG, "Verification email resent to user")
+                                }
                                 _effectFlow.update { LoginEffect.EmailNotVerified }
                             }
                         }
