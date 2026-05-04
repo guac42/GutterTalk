@@ -3,15 +3,14 @@ package com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.csci448.backstreet_bowlers.guttertalk.data.BowlingScore
-import com.csci448.backstreet_bowlers.guttertalk.data.BowlingScoreRepository
-import com.csci448.backstreet_bowlers.guttertalk.data.UserInformation
-import com.csci448.backstreet_bowlers.guttertalk.data.UserRepository
+import com.csci448.backstreet_bowlers.guttertalk.data.database.BowlingScore
+import com.csci448.backstreet_bowlers.guttertalk.data.database.BowlingScoreRepository
+import com.csci448.backstreet_bowlers.guttertalk.data.database.UserInformation
+import com.csci448.backstreet_bowlers.guttertalk.data.database.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
 class ScoresViewModel(

@@ -1,9 +1,8 @@
-package com.csci448.backstreet_bowlers.guttertalk.data
+package com.csci448.backstreet_bowlers.guttertalk.data.database
 
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.IgnoreExtraProperties
 import java.util.Date
-import java.util.UUID
 
 /**
  * BowlingScore
@@ -21,5 +20,5 @@ data class BowlingScore (
     val scores: List<Int?> = List(10){null},
     val frameNumber: Int? = 1,
     val score: Int? = null,
-    val datePlayed: Date = java.util.Date()
+    val datePlayed: Date = Date()
 )

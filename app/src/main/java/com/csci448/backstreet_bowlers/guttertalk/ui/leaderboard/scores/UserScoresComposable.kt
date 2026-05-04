@@ -26,8 +26,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.csci448.backstreet_bowlers.guttertalk.R
-import com.csci448.backstreet_bowlers.guttertalk.data.BowlingScore
-import com.csci448.backstreet_bowlers.guttertalk.data.UserInformation
+import com.csci448.backstreet_bowlers.guttertalk.data.database.BowlingScore
+import com.csci448.backstreet_bowlers.guttertalk.data.database.UserInformation
 import com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.GutterTalkSingleRow
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.GutterTalkViewModelFactory
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.ScoresViewModel
@@ -349,7 +349,9 @@ private object MockData {
         lifetimeScore = 781,
         lifetimeSpares = 14,
         lifetimeStrikes = 6,
-        location = "Denver",
+        country = "US",
+        city = "Denver",
+        adminDistrict = "CO",
         highestScore = 231
     )
 }

@@ -7,7 +7,7 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.csci448.backstreet_bowlers.guttertalk.R
-import com.csci448.backstreet_bowlers.guttertalk.data.BowlingScore
+import com.csci448.backstreet_bowlers.guttertalk.data.database.BowlingScore
 import com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.GutterTalkScoresScreen
 import java.util.UUID
 

@@ -24,6 +24,9 @@ object GlobalLeaderboardSpec : IScreenSpec {
         navBackStackEntry: NavBackStackEntry
     ) {
         Log.d(LOG_TAG, "Navigating to Global Leaderboard Screen")
+
+
+
         GutterTalkScoresScreen(
             modifier = modifier, screen = 1
         )

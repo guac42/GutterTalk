@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.csci448.backstreet_bowlers.guttertalk.data.BowlingScore
+import com.csci448.backstreet_bowlers.guttertalk.data.database.BowlingScore
 import java.util.UUID
 
 /**

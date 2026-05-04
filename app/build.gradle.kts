@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.kotlin.reflect)
     implementation(libs.coil.compose)
     implementation(libs.sceneview)
+    implementation(libs.google.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

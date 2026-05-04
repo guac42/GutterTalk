@@ -1,5 +1,7 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.scores
 
+import android.R
+import android.R.attr.country
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,11 +34,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.csci448.backstreet_bowlers.guttertalk.data.UserInformation
+import com.csci448.backstreet_bowlers.guttertalk.data.database.UserInformation
 
 
 @Composable
-fun LeaderboardComposable(users: List<UserInformation>?){
+fun LeaderboardComposable(users: List<UserInformation>?, isLocal: Boolean = false, country:String? = null){
     Column(
         modifier = Modifier
             .padding(1.dp)
@@ -44,59 +46,112 @@ fun LeaderboardComposable(users: List<UserInformation>?){
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Text(
-            text = "Global Leaderboards",
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleMedium
-        )
-        Text(
-            text = "Players are ranked by their lifetime score",
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Text(
-            text = "Players",
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 5.dp)
-        )
-        if(users == null){
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                Spacer(Modifier.width(12.dp))
-                Text("Loading Leaderboard...")
-            }
-        }else{
-            var usersList = mutableListOf<UserInformation>()
-            // Simulated logic of pulling scores
-            if (!users.isEmpty()) {
-                users.forEach { record ->
-                    usersList.add(record)
+        // Global leaderboard
+        if(isLocal == false){
+            Text(
+                text = "Global Leaderboards",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = "Players are ranked by their lifetime score",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = "Players",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 5.dp)
+            )
+            if(users == null){
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                    Spacer(Modifier.width(12.dp))
+                    Text("Loading Leaderboard...")
                 }
+            }else{
+                var usersList = mutableListOf<UserInformation>()
+                // Simulated logic of pulling scores
+                if (!users.isEmpty()) {
+                    users.forEach { record ->
+                        usersList.add(record)
+                    }
+                }
+                usersList.sortByDescending { it.lifetimeScore }
+                GlobalLeaderboard(usersList, isLocal)
             }
-            usersList.sortByDescending { it.lifetimeScore }
-            GlobalLeaderboard(usersList)
+            // Local leaderboard
+        }else {
+            Text(
+                text = "Local Leaderboards",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium
+            )
+            // Displays the location of the "local" leaderboard
+            if(country != null){
+                Text(
+                    text = country,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+            Text(
+                text = "Players are ranked by their lifetime score",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = "Players",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 5.dp)
+            )
+            if (users == null) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                    Spacer(Modifier.width(12.dp))
+                    Text("Loading Leaderboard...")
+                }
+            } else {
+                var usersList = mutableListOf<UserInformation>()
+                // Simulated logic of pulling scores
+                if (!users.isEmpty()) {
+                    users.forEach { record ->
+                        usersList.add(record)
+                    }
+                }
+                usersList.sortByDescending { it.lifetimeScore }
+                GlobalLeaderboard(usersList, isLocal)
+            }
         }
     }
 }
 @Composable
-fun GlobalLeaderboard(users: List<UserInformation>) {
+fun GlobalLeaderboard(users: List<UserInformation>, isLocal: Boolean) {
     LazyColumn {
         items(users.size) { user ->
-            LeaderboardCard(user = users.get(user))
+            LeaderboardCard(user = users.get(user), isLocal = isLocal)
         }
     }
 }
 
 @Composable
-fun LeaderboardCard(user: UserInformation) {
+fun LeaderboardCard(user: UserInformation, isLocal:Boolean) {
     // Local state to track if this specific card is expanded
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -116,9 +171,15 @@ fun LeaderboardCard(user: UserInformation) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                var location:String?
+                if(isLocal){
+                    location = user.city + " | " + user.adminDistrict
+                } else {
+                    location = user.country
+                }
                 Column {
                     Text(text = user.username, style = MaterialTheme.typography.titleLarge)
-                    Text(text = user.location ?: "Unknown Location", style = MaterialTheme.typography.bodySmall)
+                    Text(text = location ?: "Unknown Location", style = MaterialTheme.typography.bodySmall)
                 }
                 Text(
                     text = "${user.lifetimeScore}",
@@ -166,7 +227,7 @@ fun PreviewBufferingLeaderboard() {
 @Preview(showBackground = true, name = "Single Card Detail")
 @Composable
 fun PreviewSingleCard() {
-    LeaderboardCard(user = MockDataGlobal.user1)
+    LeaderboardCard(user = MockDataGlobal.user1, false)
 }
 
 object MockDataGlobal {
@@ -177,7 +238,9 @@ object MockDataGlobal {
         lifetimeScore = 8200,
         lifetimeSpares = 120,
         lifetimeStrikes = 210,
-        location = "Golden, CO",
+        country = "US",
+        city = "Denver",
+        adminDistrict = "CO",
         highestScore = 289
     )
 
@@ -188,7 +251,9 @@ object MockDataGlobal {
         lifetimeScore = 5400,
         lifetimeSpares = 150,
         lifetimeStrikes = 85,
-        location = "Denver, CO",
+        country = "US",
+        city = "Golden",
+        adminDistrict = "CO",
         highestScore = 210
     )
 

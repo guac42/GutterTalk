@@ -1,4 +1,4 @@
-package com.csci448.backstreet_bowlers.guttertalk.data
+package com.csci448.backstreet_bowlers.guttertalk.data.database
 
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.IgnoreExtraProperties
@@ -11,6 +11,8 @@ data class UserInformation(
     val lifetimeScore: Int = 0,
     val lifetimeSpares: Int = 0,
     val lifetimeStrikes: Int = 0,
-    val location: String? = null,
+    val city: String? = null,
+    val adminDistrict: String? = null,
+    val country: String? = null,
     val highestScore: Int = 0
 )

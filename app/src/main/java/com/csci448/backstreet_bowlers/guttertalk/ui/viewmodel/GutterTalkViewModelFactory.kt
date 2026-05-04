@@ -7,12 +7,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.MutableCreationExtras
-import com.csci448.backstreet_bowlers.guttertalk.data.BowlingScoreRepository
-import com.csci448.backstreet_bowlers.guttertalk.data.UserRepository
+import com.csci448.backstreet_bowlers.guttertalk.data.database.BowlingScoreRepository
+import com.csci448.backstreet_bowlers.guttertalk.data.database.UserRepository
 
 class GutterTalkViewModelFactory : ViewModelProvider.Factory {
     companion object {
         private const val LOG_TAG = "448.GutterTalkViewModelFactory"
+        private val userRepository = UserRepository()
         private val CONTEXT_KEY = object : CreationExtras.Key<Context> {}
         fun creationExtras(defaultCreationExtras: CreationExtras, context: Context) =
             MutableCreationExtras(defaultCreationExtras).apply {
@@ -28,7 +29,7 @@ class GutterTalkViewModelFactory : ViewModelProvider.Factory {
             isAssignableFrom(LoginViewModel::class.java) -> {
                 Log.d(LOG_TAG, "creating LoginViewModel")
                 val savedStateHandle = extras.createSavedStateHandle()
-                LoginViewModel(savedStateHandle)
+                LoginViewModel(savedStateHandle, userRepository)
             }
 
             isAssignableFrom(GameViewModel::class.java) -> {
@@ -47,9 +48,18 @@ class GutterTalkViewModelFactory : ViewModelProvider.Factory {
             isAssignableFrom(ScoresViewModel::class.java) -> {
                 Log.d(LOG_TAG, "creating ScoresViewModel")
                 ScoresViewModel(
-                    userRepository = UserRepository(),
+                    userRepository = userRepository,
                     scoreRepository = BowlingScoreRepository()
                 )
+            }
+
+            isAssignableFrom(LeaderboardViewModel::class.java)->{
+
+                    Log.d(LOG_TAG, "creating LoginViewModel")
+                    val savedStateHandle = extras.createSavedStateHandle()
+                LeaderboardViewModel(savedStateHandle = savedStateHandle, application = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]
+                    ?: throw IllegalArgumentException("Application context is required"))
+
             }
 
             else -> {

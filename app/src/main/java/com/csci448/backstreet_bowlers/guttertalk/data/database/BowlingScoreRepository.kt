@@ -1,12 +1,10 @@
-package com.csci448.backstreet_bowlers.guttertalk.data
+package com.csci448.backstreet_bowlers.guttertalk.data.database
 
 import android.util.Log
-import androidx.core.content.PackageManagerCompat.LOG_TAG
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.tasks.await
 
 class BowlingScoreRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -53,26 +51,26 @@ class BowlingScoreRepository(
         emit(scores)
 
         // Replace with your actual collection and document IDs
-                /*
-        val docRef = scoresCollection.document("IuZcpoSekHRKI7iXQ2fA3fl0Qwu2")
+        /*
+val docRef = scoresCollection.document("IuZcpoSekHRKI7iXQ2fA3fl0Qwu2")
 
-        docRef.get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    // document.data returns a Map<String, Any>
-                    val data = document.data
-                    Log.d("Tag", "Document Data (Map format): $data")
+docRef.get()
+    .addOnSuccessListener { document ->
+        if (document != null && document.exists()) {
+            // document.data returns a Map<String, Any>
+            val data = document.data
+            Log.d("Tag", "Document Data (Map format): $data")
 
-                    // If you want it to look exactly like a JSON string in your logs:
-                    // You could use a library like Gson or just print the map
-                    Log.d("Tag", "Fields: ${data?.keys}")
-                } else {
-                    Log.d("Tag", "No such document exists!")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.e("Tag", "Error getting document: ", exception)
-            }*/
+            // If you want it to look exactly like a JSON string in your logs:
+            // You could use a library like Gson or just print the map
+            Log.d("Tag", "Fields: ${data?.keys}")
+        } else {
+            Log.d("Tag", "No such document exists!")
+        }
+    }
+    .addOnFailureListener { exception ->
+        Log.e("Tag", "Error getting document: ", exception)
+    }*/
     }
 
     suspend fun updateScore(score: BowlingScore) {
