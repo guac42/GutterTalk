@@ -5,11 +5,12 @@ import com.google.firebase.firestore.IgnoreExtraProperties
 
 @IgnoreExtraProperties
 data class UserInformation(
-    @DocumentId val userId: String,
+    @DocumentId val PlayerID: String = "",
     val username: String = "",
     val gamesPlayed: Int = 0,
     val lifetimeScore: Int = 0,
     val lifetimeSpares: Int = 0,
     val lifetimeStrikes: Int = 0,
-    val location: String? = null
+    val location: String? = null,
+    val highestScore: Int = 0
 )

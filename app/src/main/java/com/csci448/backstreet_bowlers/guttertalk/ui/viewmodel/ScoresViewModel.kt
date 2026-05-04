@@ -1,5 +1,6 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.csci448.backstreet_bowlers.guttertalk.data.BowlingScore
@@ -9,6 +10,7 @@ import com.csci448.backstreet_bowlers.guttertalk.data.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
 class ScoresViewModel(
@@ -22,6 +24,9 @@ class ScoresViewModel(
     private val _topUsers = MutableStateFlow<List<UserInformation>>(emptyList())
     val topUsers: StateFlow<List<UserInformation>> = _topUsers.asStateFlow()
 
+    private val _userStats = MutableStateFlow<UserInformation?>(null)
+    val userStats: StateFlow<UserInformation?> = _userStats.asStateFlow()
+
     fun loadUserScores(userId: String) {
         viewModelScope.launch {
             scoreRepository.getUserScores(userId).collect { scores ->
@@ -29,6 +34,20 @@ class ScoresViewModel(
             }
         }
     }
+
+    fun loadUserInformation(userId: String){
+        viewModelScope.launch {
+            userRepository.getUser(userId)
+            try{
+                val info = userRepository.getUser(userId)
+                _userStats.value = info
+            } catch (e: Exception){
+                Log.e("ViewModel", "Error loading user states", e)
+                _userStats.value = null
+            }
+        }
+    }
+
 
     fun loadGlobalTopScores(limit: Long = 10) {
         viewModelScope.launch {

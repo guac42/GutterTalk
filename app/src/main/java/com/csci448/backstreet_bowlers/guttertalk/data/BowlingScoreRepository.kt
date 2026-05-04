@@ -1,6 +1,7 @@
 package com.csci448.backstreet_bowlers.guttertalk.data
 
 import android.util.Log
+import androidx.core.content.PackageManagerCompat.LOG_TAG
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.flow
 class BowlingScoreRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
+    private val LOG_TAG = "448.BowlingScoreRepository"
     private val scoresCollection = firestore.collection("UserScores")
 
     suspend fun addScore(score: BowlingScore) {
@@ -25,13 +27,13 @@ class BowlingScoreRepository(
     }
 
     fun getUserScores(userId: String): Flow<List<BowlingScore>> = flow {
-        Log.d("BowlingScoreRepository", "Fetching user scores for user ID: $userId")
+        Log.d(LOG_TAG, "Fetching user scores for user ID: $userId")
         val snapshot = scoresCollection
             .whereEqualTo("PlayerID", userId)
             .get()
             .await()
 
-        Log.d("FirestoreData", "Total documents found: ${snapshot.size()}")
+        Log.d(LOG_TAG, "Total documents found: ${snapshot.size()}")
 
         // 2. Map the documents to your class
         val scores = snapshot.documents.mapNotNull { doc ->
@@ -45,7 +47,7 @@ class BowlingScoreRepository(
 
         // 3. Log each document as a Map (JSON-like structure)
         snapshot.documents.forEachIndexed { index, doc ->
-            Log.d("FirestoreData", "Doc $index ID: ${doc.id} => Data: ${doc.data}")
+            Log.d(LOG_TAG, "Doc $index ID: ${doc.id} => Data: ${doc.data}")
         }
 
         emit(scores)
