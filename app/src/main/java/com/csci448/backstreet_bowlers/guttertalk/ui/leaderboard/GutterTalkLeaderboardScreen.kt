@@ -1,5 +1,6 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,10 +17,12 @@ import com.csci448.backstreet_bowlers.guttertalk.ui.common.GutterTalkButton
 @Composable
 fun GutterTalkLeaderboardScreen(
     modifier: Modifier = Modifier,
+    isLocationEnabled: Boolean,
     onUserScoresClick: () -> Unit,
     onGlobalLeaderboardClick: () -> Unit,
     onLocalLeaderboardClick: () -> Unit
 ) {
+    Log.d("448.GutterTalkLeaderboardScreen", "Current enabled value is: $isLocationEnabled")
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -34,12 +37,12 @@ fun GutterTalkLeaderboardScreen(
         GutterTalkButton(
             text = stringResource(R.string.leaderboard_screen_global),
             onClick = onGlobalLeaderboardClick,
-            enabled = false
+            enabled = true
         )
         GutterTalkButton(
             text = stringResource(R.string.leaderboard_screen_local),
             onClick = onLocalLeaderboardClick,
-            enabled = false
+            enabled = isLocationEnabled
         )
     }
 }
@@ -50,6 +53,7 @@ fun GutterTalkLeaderboardScreenPreview() {
     GutterTalkLeaderboardScreen(
         onUserScoresClick = {},
         onGlobalLeaderboardClick = {},
-        onLocalLeaderboardClick = {}
+        onLocalLeaderboardClick = {},
+        isLocationEnabled = true
     )
 }

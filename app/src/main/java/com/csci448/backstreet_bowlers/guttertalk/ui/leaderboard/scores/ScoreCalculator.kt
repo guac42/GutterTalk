@@ -1,6 +1,6 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.scores
 
-import com.csci448.backstreet_bowlers.guttertalk.data.BowlingScore
+import com.csci448.backstreet_bowlers.guttertalk.data.database.BowlingScore
 
 /**
  * Likely an arbitrary class that we will remove later
