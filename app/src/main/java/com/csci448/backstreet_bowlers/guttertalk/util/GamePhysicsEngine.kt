@@ -1,5 +1,8 @@
 package com.csci448.backstreet_bowlers.guttertalk.util
 
+import android.util.Log
+import io.github.sceneview.math.localToWorldPosition
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.serialization.Serializable
 import org.ode4j.math.*
 import org.ode4j.ode.*
@@ -7,6 +10,7 @@ import org.ode4j.ode.*
 
 class GamePhysicsEngine {
     companion object {
+        private const val LOG_TAG = "448.GamePhysicsEngine"
         const val LANE_LENGTH = 19.16
         const val LANE_WIDTH = 1.06
         const val LANE_THICKNESS = 0.1
@@ -32,6 +36,7 @@ class GamePhysicsEngine {
     private val pinMass = 1.53 // pin weight kg
     private val pinRestitution = 0.5
 
+    private val semaphore = Semaphore(permits = 1)
 
     fun init() {
         OdeHelper.initODE2(0)
@@ -50,6 +55,18 @@ class GamePhysicsEngine {
         setupGutters()
         setupBall()
         setupPins()
+        resetPins()
+    }
+
+    suspend fun reset() {
+        semaphore.acquire()
+
+        ballBody.setPosition(0.0, BALL_RADIUS, -LANE_LENGTH/2)
+        ballBody.linearVel = DVector3()
+        ballBody.angularVel = DVector3()
+        resetPins()
+
+        semaphore.release()
     }
 
     private fun setupLane() {
@@ -85,9 +102,27 @@ class GamePhysicsEngine {
     }
 
     private fun setupPins() {
-        pinBodies.clear()
-        pinGeoms.clear()
+        repeat(10) {
+            val body = OdeHelper.createBody(world).apply {
+                mass = OdeHelper.createMass().also { m ->
+                    m.setCylinderTotal(pinMass, 2, PIN_RADIUS, PIN_HEIGHT)
+                    this.mass = m
+                }
+                angularDamping = 0.1
+            }
+            // Capsule geom: good approximation for a pin shape
+            val geom = OdeHelper.createCapsule(space, PIN_RADIUS, PIN_HEIGHT-2*PIN_RADIUS).apply {
+                val rot = DMatrix3()
+                OdeMath.dRFromAxisAndAngle(rot, 1.0, 0.0, 0.0, Math.PI/2)
+                this.rotation = rot
+                this.body = body
+            }
+            pinBodies.add(body)
+            pinGeoms.add(geom)
+        }
+    }
 
+    private fun resetPins() {
         val spacing = 0.305 // 12 inches between pin centers
         val pinFormation = listOf(
             // Row 1
@@ -106,33 +141,30 @@ class GamePhysicsEngine {
             DVector3( spacing*1.5, PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 2.598)
         )
 
-        pinFormation.forEach { pos ->
-            val body = OdeHelper.createBody(world).apply {
-                setPosition(pos.get0(), pos.get1(), pos.get2())
-                mass = OdeHelper.createMass().also { m ->
-                    m.setCylinderTotal(pinMass, 2, PIN_RADIUS, PIN_HEIGHT)
-                    this.mass = m
-                }
-                angularDamping = 0.1
-            }
-            // Capsule geom: good approximation for a pin shape
-            val geom = OdeHelper.createCapsule(space, PIN_RADIUS, PIN_HEIGHT-2*PIN_RADIUS).apply {
-                this.body = body
-            }
-            pinBodies.add(body)
-            pinGeoms.add(geom)
+        pinFormation.forEachIndexed { index, pos ->
+            pinBodies[index].setPosition(pos.get0(), pos.get1(), pos.get2())
+            pinBodies[index].linearVel = DVector3()
+            pinBodies[index].angularVel = DVector3()
         }
     }
 
-    fun throwBall(velocityX: Double, velocityZ: Double, spinY: Double) {
+    suspend fun throwBall(velocityX: Double, velocityZ: Double, spinY: Double) {
+        semaphore.acquire()
+
         ballBody.setPosition(0.0, BALL_RADIUS, -LANE_LENGTH/2)
         ballBody.setLinearVel(velocityX, 0.0, -velocityZ)
         ballBody.setAngularVel(0.0, spinY, 0.0)
+
+        semaphore.release()
     }
 
-    fun step(deltaTime: Double): PhysicsSnapshot3D {
+    suspend fun step(deltaTime: Double): PhysicsSnapshot3D {
+        semaphore.acquire()
+
         space.collide(null, nearCallback)
         world.quickStep(deltaTime)
+
+        semaphore.release()
 
         return buildSnapshot()
     }
@@ -144,7 +176,7 @@ class GamePhysicsEngine {
         // Skip if both geoms are connected by a joint already
         if (b1 != null && b2 != null && OdeHelper.areConnected(b1, b2)) return@DNearCallback
 
-        val MAX_CONTACTS = 8;
+        val MAX_CONTACTS = 10;
         val contacts = DContactBuffer(MAX_CONTACTS)
 
         val n = OdeHelper.collide(o1, o2, MAX_CONTACTS, contacts.geomBuffer)

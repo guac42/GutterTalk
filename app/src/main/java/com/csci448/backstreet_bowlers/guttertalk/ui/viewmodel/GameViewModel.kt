@@ -45,13 +45,30 @@ internal constructor(
 
     init {
         physics.init()
+
+        viewModelScope.launch(Dispatchers.Default) {
+            Log.d(LOG_TAG, "Launching physics coroutine")
+            while (isActive) {
+                val updateTime = System.currentTimeMillis()
+                val snap = physics.step(1.0 / 60.0)
+                _stateFlow.update { current ->
+                    current.copy(
+                        physicsSnapshot = snap
+                    )
+                }
+                val nextUpdate = updateTime + 1000.0 / 60
+                delay(16L)
+            }
+        }
     }
 
     override fun handleIntent(intent: GameIntent) {
         when (intent) {
             is GameIntent.ThrowBall -> {
                 Log.d(LOG_TAG, "Received throw intent: ${intent.swipeVelocityX} ${intent.swipeVelocityZ} ${intent.swipeSpin}")
-                physics.throwBall(intent.swipeVelocityX, intent.swipeVelocityZ, intent.swipeSpin)
+                viewModelScope.launch {
+                    physics.throwBall(intent.swipeVelocityX, intent.swipeVelocityZ, intent.swipeSpin)
+                }
             }
             is GameIntent.BallSettled -> {
                 viewModelScope.launch {
@@ -64,22 +81,9 @@ internal constructor(
                 }
             }
             is GameIntent.ResetPins -> {
-                physicsJob?.cancel()
-                startPhysicsLoop()
-            }
-        }
-    }
-
-    private fun startPhysicsLoop() {
-        physicsJob = viewModelScope.launch(Dispatchers.Default) {
-            while (isActive) {
-                val snap = physics.step(1.0 / 60.0)
-                _stateFlow.update { current ->
-                    current.copy(
-                        physicsSnapshot = snap
-                    )
+                viewModelScope.launch {
+                    physics.reset()
                 }
-                delay(16L)
             }
         }
     }

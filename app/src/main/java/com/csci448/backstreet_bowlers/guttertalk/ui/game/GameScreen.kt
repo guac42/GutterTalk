@@ -39,7 +39,6 @@ import dev.romainguy.kotlin.math.rotation
 import io.github.sceneview.SceneView
 import io.github.sceneview.math.Position
 import io.github.sceneview.math.Scale
-import io.github.sceneview.node.CylinderNode
 import io.github.sceneview.rememberCameraNode
 import io.github.sceneview.rememberCollisionSystem
 import io.github.sceneview.rememberEngine
@@ -47,7 +46,6 @@ import io.github.sceneview.rememberEnvironmentLoader
 import io.github.sceneview.rememberMaterialLoader
 import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberView
-import kotlin.math.sqrt
 
 @Composable
 fun GutterTalkLaneScreen(
@@ -76,7 +74,7 @@ fun GutterTalkLaneScreen(
         remember(materialLoader) { materialLoader.createColorInstance(Color(0xFF4CAF50)) }
 
     val cameraNode = rememberCameraNode(engine) {
-        position = Position(0f, 2f, 1f)
+        position = Position(0f, 8f, 1f)
         lookAt(Position(0f, 0f, -18f))
     }
 
