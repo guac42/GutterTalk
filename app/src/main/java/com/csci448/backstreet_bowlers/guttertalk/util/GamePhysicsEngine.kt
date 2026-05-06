@@ -1,36 +1,50 @@
 package com.csci448.backstreet_bowlers.guttertalk.util
 
-import com.jme3.bullet.PhysicsSpace
-import com.jme3.bullet.collision.shapes.BoxCollisionShape
-import com.jme3.bullet.collision.shapes.CapsuleCollisionShape
-import com.jme3.bullet.collision.shapes.PlaneCollisionShape
-import com.jme3.bullet.collision.shapes.SphereCollisionShape
-import com.jme3.bullet.objects.PhysicsRigidBody
-import com.jme3.math.Plane
-import com.jme3.math.Vector3f
+import kotlinx.serialization.Serializable
+import org.ode4j.math.*
+import org.ode4j.ode.*
+
 
 class GamePhysicsEngine {
-    private lateinit var physicsSpace: PhysicsSpace
-    private lateinit var ballBody: PhysicsRigidBody
-    private val pinBodies = mutableListOf<PhysicsRigidBody>()
+    companion object {
+        const val LANE_LENGTH = 19.16
+        const val LANE_WIDTH = 1.06
+        const val LANE_THICKNESS = 0.1
+        const val GUTTER_WIDTH = 0.23
+        const val GUTTER_DEPTH = 0.047
+        const val BALL_RADIUS = 0.108 // in meters
+        const val PIN_HEIGHT = 0.38 // in meters
+        const val PIN_RADIUS = 0.06 // in meters
+    }
 
-    private val laneLength = 19.16f
-    private val laneWidth = 1.06f
-    private val laneThickness = 0.1f
-    private val gutterWidth = 0.23f
-    private val gutterDepth = 0.047f
-    private val ballRadius = 0.108f // radius in meters
-    private val ballMass = 6.8f // mass in kg
-    private val ballRestitution = 0.6f
-    private val ballFriction = 0.15f
-    private val pinStartZ = 18.29f // distance to center of front pin
-    private val pinWeight = 1.53f // pin weight kg
-    private val pinRestitution = 0.5f
+    private lateinit var world: DWorld
+    private lateinit var space: DSpace
+    private lateinit var contactGroup: DJointGroup
+    private lateinit var ballBody: DBody
+    private lateinit var ballGeom: DGeom
+    private val pinBodies = mutableListOf<DBody>()
+    private val pinGeoms = mutableListOf<DGeom>()
+
+    private val ballMass = 6.8 // mass in kg
+    private val ballRestitution = 0.6
+    private val ballFriction = 0.15
+    private val pinStartZ = 18.29 // distance to center of front pin
+    private val pinMass = 1.53 // pin weight kg
+    private val pinRestitution = 0.5
 
 
     fun init() {
-        physicsSpace = PhysicsSpace(PhysicsSpace.BroadphaseType.DBVT)
-        physicsSpace.setGravity(Vector3f(0f, -9.8f, 0f))
+        OdeHelper.initODE2(0)
+
+        world = OdeHelper.createWorld().apply {
+            // erp           = 0.8     // error reduction (bounciness tuning)
+            cfm           = 1e-5    // constraint force mixing (softness)
+            quickStepNumIterations = 20
+            setGravity(DVector3(0.0, -9.8, 0.0))
+        }
+
+        space = OdeHelper.createHashSpace()
+        contactGroup = OdeHelper.createJointGroup()
 
         setupLane()
         setupGutters()
@@ -39,110 +53,148 @@ class GamePhysicsEngine {
     }
 
     private fun setupLane() {
-        val floor = PhysicsRigidBody(BoxCollisionShape(Vector3f(laneWidth/2, laneThickness/2, laneLength/2)), 0f)
-        floor.setPhysicsLocation(Vector3f(0f, -laneThickness/2, -laneLength/2))
-        physicsSpace.addCollisionObject(floor)
+        OdeHelper.createBox(space, DVector3(LANE_WIDTH, LANE_THICKNESS, LANE_LENGTH)).apply {
+            setPosition(0.0, -LANE_THICKNESS/2, -LANE_LENGTH/2)
+        }
 
         // Create a world boundary plane at y=-0.5
-        val boundary = PhysicsRigidBody(PlaneCollisionShape(Plane(Vector3f(0f, 1f, 0f), -0.5f)), 0f)
-        physicsSpace.addCollisionObject(boundary)
+        OdeHelper.createPlane(space, 0.0, 1.0, 0.0, -0.5)
     }
 
     private fun setupGutters() {
-        val gutterShape = BoxCollisionShape(Vector3f(gutterWidth/2, laneThickness/2, laneLength/2))
-        listOf(-laneWidth/2 - gutterWidth/2, laneWidth/2 + gutterWidth/2).forEach { x ->
-            val gutter = PhysicsRigidBody(gutterShape, 0f)
-            gutter.setPhysicsLocation(Vector3f(x, -laneThickness/2-gutterDepth, 0f))
-            physicsSpace.addCollisionObject(gutter)
+        OdeHelper.createBox(space, DVector3(GUTTER_WIDTH, LANE_THICKNESS, LANE_LENGTH)).apply {
+            setPosition(-LANE_WIDTH/2 - GUTTER_WIDTH/2, -LANE_THICKNESS/2-GUTTER_DEPTH, -LANE_LENGTH/2)
+        }
+        OdeHelper.createBox(space, DVector3(GUTTER_WIDTH, LANE_THICKNESS, LANE_LENGTH)).apply {
+            setPosition(LANE_WIDTH/2 + GUTTER_WIDTH/2, -LANE_THICKNESS/2-GUTTER_DEPTH, -LANE_LENGTH/2)
         }
     }
 
     private fun setupBall() {
-        val ballShape = SphereCollisionShape(ballRadius)
-        ballBody = PhysicsRigidBody(ballShape, ballMass)
-        ballBody.setPhysicsLocation(Vector3f(0f, ballRadius, -laneLength/2))
-        ballBody.restitution = ballRestitution
-        ballBody.friction = ballFriction
-        ballBody.angularDamping = 0.5f
-        physicsSpace.addCollisionObject(ballBody)
+        ballBody = OdeHelper.createBody(world).apply {
+            setPosition(0.0, BALL_RADIUS, -LANE_LENGTH/2)
+            mass = OdeHelper.createMass().also { m ->
+                m.setSphereTotal(ballMass, BALL_RADIUS)
+                this.mass = m
+            }
+            angularDamping = 0.05
+        }
+        ballGeom = OdeHelper.createSphere(space, BALL_RADIUS).apply {
+            body = ballBody
+        }
     }
 
     private fun setupPins() {
         pinBodies.clear()
+        pinGeoms.clear()
 
-        // radius 0.06m, height 0.38m
-        val pinShape = CapsuleCollisionShape(0.06f, 0.26f)
-
-        val spacing = 0.305f // 12 inches between pin centers
+        val spacing = 0.305 // 12 inches between pin centers
         val pinFormation = listOf(
             // Row 1
-            Vector3f(0f,          0f, pinStartZ),
+            DVector3(0.0,         PIN_HEIGHT/2 + 0.2, -pinStartZ),
             // Row 2
-            Vector3f(-spacing/2,  0f, pinStartZ + spacing * 0.866f),
-            Vector3f( spacing/2,  0f, pinStartZ + spacing * 0.866f),
+            DVector3(-spacing/2,  PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 0.866),
+            DVector3( spacing/2,  PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 0.866),
             // Row 3
-            Vector3f(-spacing,    0f, pinStartZ + spacing * 1.732f),
-            Vector3f(0f,          0f, pinStartZ + spacing * 1.732f),
-            Vector3f( spacing,    0f, pinStartZ + spacing * 1.732f),
+            DVector3(-spacing,    PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 1.732),
+            DVector3(0.0,         PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 1.732),
+            DVector3( spacing,    PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 1.732),
             // Row 4
-            Vector3f(-spacing*1.5f, 0f, pinStartZ + spacing * 2.598f),
-            Vector3f(-spacing/2,    0f, pinStartZ + spacing * 2.598f),
-            Vector3f( spacing/2,    0f, pinStartZ + spacing * 2.598f),
-            Vector3f( spacing*1.5f, 0f, pinStartZ + spacing * 2.598f)
+            DVector3(-spacing*1.5, PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 2.598),
+            DVector3(-spacing/2,   PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 2.598),
+            DVector3( spacing/2,   PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 2.598),
+            DVector3( spacing*1.5, PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 2.598)
         )
 
-        pinFormation.forEachIndexed { index, pos ->
-            val pin = PhysicsRigidBody(pinShape, pinWeight)
-            pin.setPhysicsLocation(Vector3f(pos.x, 0.19f, pos.z))
-            pin.restitution = pinRestitution
-            pin.friction = 0.4f
-            physicsSpace.addCollisionObject(pin)
-            pinBodies.add(pin)
+        pinFormation.forEach { pos ->
+            val body = OdeHelper.createBody(world).apply {
+                setPosition(pos.get0(), pos.get1(), pos.get2())
+                mass = OdeHelper.createMass().also { m ->
+                    m.setCylinderTotal(pinMass, 2, PIN_RADIUS, PIN_HEIGHT)
+                    this.mass = m
+                }
+                angularDamping = 0.1
+            }
+            // Capsule geom: good approximation for a pin shape
+            val geom = OdeHelper.createCapsule(space, PIN_RADIUS, PIN_HEIGHT-2*PIN_RADIUS).apply {
+                this.body = body
+            }
+            pinBodies.add(body)
+            pinGeoms.add(geom)
         }
     }
 
-    fun throwBall(velocityX: Float, velocityZ: Float, spinY: Float) {
-        ballBody.setPhysicsLocation(Vector3f(0f, ballRadius, -laneLength/2))
-        ballBody.setLinearFactor(Vector3f(velocityX, 0f, velocityZ))
-        ballBody.setAngularVelocity(Vector3f(0f, spinY, 0f))
+    fun throwBall(velocityX: Double, velocityZ: Double, spinY: Double) {
+        ballBody.setPosition(0.0, BALL_RADIUS, -LANE_LENGTH/2)
+        ballBody.setLinearVel(velocityX, 0.0, -velocityZ)
+        ballBody.setAngularVel(0.0, spinY, 0.0)
     }
 
-    fun step(deltaTime: Float): PhysicsSnapshot3D {
-        physicsSpace.update(deltaTime)
+    fun step(deltaTime: Double): PhysicsSnapshot3D {
+        space.collide(null, nearCallback)
+        world.quickStep(deltaTime)
 
-        val ballPos = ballBody.getPhysicsLocation(null)
-        val ballRot = ballBody.getPhysicsRotation(null)
+        return buildSnapshot()
+    }
+
+    private val nearCallback = DGeom.DNearCallback { _, o1, o2 ->
+        val b1 = o1.body
+        val b2 = o2.body
+
+        // Skip if both geoms are connected by a joint already
+        if (b1 != null && b2 != null && OdeHelper.areConnected(b1, b2)) return@DNearCallback
+
+        val MAX_CONTACTS = 8;
+        val contacts = DContactBuffer(MAX_CONTACTS)
+
+        val n = OdeHelper.collide(o1, o2, MAX_CONTACTS, contacts.geomBuffer)
+        repeat(n) { i ->
+            contacts[i].surface.apply {
+                mode      = OdeConstants.dContactBounce or OdeConstants.dContactSoftCFM
+                mu        = 0.6          // friction
+                bounce    = 0.35         // restitution
+                bounce_vel = 0.1         // minimum velocity for bounce
+                soft_cfm = 0.001
+            }
+            OdeHelper.createContactJoint(world, contactGroup, contacts[i]).apply {
+                attach(b1, b2)
+            }
+        }
+    }
+
+    private fun buildSnapshot(): PhysicsSnapshot3D {
+        val ballPos = ballBody.position
+        val ballRot = ballBody.quaternion
 
         val pins = pinBodies.mapIndexed { i, body ->
-            val pos = body.getPhysicsLocation(null)
-            val rot = body.getPhysicsRotation(null)
+            val pos = body.position
+            val rot = body.quaternion
+            val vel = body.linearVel
+            val ang = body.angularVel
             PinSnapshot3D(
-                id = i,
-                posX = pos.x, posY = pos.y, posZ = pos.z,
-                rotX = rot.x, rotY = rot.y, rotZ = rot.z, rotW = rot.w,
-                isSettled = body.getLinearVelocity(null).length() < 0.05f &&
-                        body.getLinearVelocity(null).length() < 0.05f
+                id     = i,
+                posX   = pos.get0().toFloat(), posY = pos.get1().toFloat(), posZ = pos.get2().toFloat(),
+                rotX   = rot.get1().toFloat(), rotY = rot.get2().toFloat(),
+                rotZ   = rot.get3().toFloat(), rotW = rot.get0().toFloat(), // ode4j: w,x,y,z order
+                isSettled = vel.length() < 0.05 && ang.length() < 0.05
             )
         }
 
-        PhysicsSnapshot3D(
-            ballPosX = ballPos.x, ballPosY = ballPos.y, ballPosZ = ballPos.z,
-            ballRotX = ballRot.x, ballRotY = ballRot.y,
-            ballRotZ = ballRot.z, ballRotW = ballRot.w,
-            pins = pins,
-            allSettled = pins.all { it.isSettled }
+        return PhysicsSnapshot3D(
+            ballPosX = ballPos.get0().toFloat(),
+            ballPosY = ballPos.get1().toFloat(),
+            ballPosZ = ballPos.get2().toFloat(),
+            ballRotX = ballRot.get1().toFloat(),
+            ballRotY = ballRot.get2().toFloat(),
+            ballRotZ = ballRot.get3().toFloat(),
+            ballRotW = ballRot.get0().toFloat(),
+            pins        = pins,
+            allSettled  = pins.all { it.isSettled }
         )
-    }
-
-    fun reset() {
-        pinBodies.forEach { physicsSpace.removeCollisionObject(it) }
-        physicsSpace.removeCollisionObject(ballBody)
-        pinBodies.clear()
-        setupBall()
-        setupPins()
     }
 }
 
+@Serializable
 data class PhysicsSnapshot3D(
     val ballPosX: Float, val ballPosY: Float, val ballPosZ: Float,
     val ballRotX: Float, val ballRotY: Float, val ballRotZ: Float, val ballRotW: Float,
@@ -150,6 +202,7 @@ data class PhysicsSnapshot3D(
     val allSettled: Boolean
 )
 
+@Serializable
 data class PinSnapshot3D(
     val id: Int,
     val posX: Float, val posY: Float, val posZ: Float,

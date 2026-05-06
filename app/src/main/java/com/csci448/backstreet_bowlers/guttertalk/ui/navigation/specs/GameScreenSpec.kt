@@ -73,7 +73,11 @@ object GameScreenSpec : IScreenSpec {
             },
             onThrow = {
                 dispatcher.invoke(it)
-            }
+            },
+            onReset = {
+                dispatcher.invoke(GameIntent.ResetPins)
+            },
+            physicsSnapshot = state.physicsSnapshot
         )
     }
 

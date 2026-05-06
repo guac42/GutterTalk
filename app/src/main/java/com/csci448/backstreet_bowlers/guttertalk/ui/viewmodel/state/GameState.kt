@@ -1,5 +1,6 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.state
 
+import com.csci448.backstreet_bowlers.guttertalk.util.PhysicsSnapshot3D
 import kotlinx.serialization.Serializable
 
 /**
@@ -15,4 +16,5 @@ data class GameState(
     val frameScores: List<Int>   = emptyList(),
     val currentFrame: Int        = 1,
     val throwInFrame: Int        = 0,
+    val physicsSnapshot: PhysicsSnapshot3D? = null,
 ) : GutterTalkState

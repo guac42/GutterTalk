@@ -20,9 +20,9 @@ class GameGestureHandler(
         val swipeCurve = (e2.x - e1.x)      // positive = curved right
         val forwardSpeed = (-velocity.y / 200f)       // tune divisor for feel
             .coerceIn(5f, 20f)                       // clamp to realistic m/s
-        val aimX = (velocity.x / 1000f).coerceIn(-3f, 3f)
+        val aimX = (velocity.x / 1000).coerceIn(-3f, 3f)
         val spin  = swipeCurve / 300f                // hook effect
 
-        onThrow(GameIntent.ThrowBall(aimX, forwardSpeed, spin))
+        onThrow(GameIntent.ThrowBall(aimX.toDouble(), forwardSpeed.toDouble(), spin.toDouble()))
     }
 }

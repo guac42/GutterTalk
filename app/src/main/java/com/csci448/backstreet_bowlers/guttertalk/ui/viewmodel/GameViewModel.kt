@@ -11,6 +11,7 @@ import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.state.GameState
 import com.csci448.backstreet_bowlers.guttertalk.util.GamePhysicsEngine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -62,29 +63,20 @@ internal constructor(
                     }
                 }
             }
-            is GameIntent.ResetPins -> {}
+            is GameIntent.ResetPins -> {
+                physicsJob?.cancel()
+                startPhysicsLoop()
+            }
         }
     }
 
     private fun startPhysicsLoop() {
         physicsJob = viewModelScope.launch(Dispatchers.Default) {
             while (isActive) {
-                val snap = physics.step(1f / 60f)
+                val snap = physics.step(1.0 / 60.0)
                 _stateFlow.update { current ->
                     current.copy(
-                        ballTransform = PhysicsTransform(
-                            snap.ballPosX, snap.ballPosY, snap.ballPosZ,
-                            snap.ballRotX, snap.ballRotY, snap.ballRotZ, snap.ballRotW
-                        ),
-                        pinTransforms = snap.pins.map { p ->
-                            IndexedTransform(p.id, PhysicsTransform(
-                                p.posX, p.posY, p.posZ,
-                                p.rotX, p.rotY, p.rotZ, p.rotW
-                            ))
-                        },
-                        phase = if (snap.allSettled &&
-                            current.phase == GamePhase.ROLLING) GamePhase.SCORED
-                        else current.phase
+                        physicsSnapshot = snap
                     )
                 }
                 delay(16L)
