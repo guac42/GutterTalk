@@ -1,5 +1,6 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.navigation.specs
 
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -57,8 +58,9 @@ object GameScreenSpec : IScreenSpec {
 
         effects.collectInLaunchedEffect {
             when(it) {
-                GameEffect.Spare -> {}
-                GameEffect.Strike -> {}
+                is GameEffect.Insult -> {
+                    Toast.makeText(context, it.insult, Toast.LENGTH_LONG).show()
+                }
                 null -> {}
             }
         }
@@ -68,9 +70,11 @@ object GameScreenSpec : IScreenSpec {
             isInsultsOn = settingsState.isInsultsOn,
             onBallSettled = {
                 dispatcher.invoke(GameIntent.BallSettled(it))
+            },
+            onThrow = {
+                dispatcher.invoke(it)
             }
         )
-
     }
 
     @Composable

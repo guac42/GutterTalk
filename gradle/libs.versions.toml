@@ -16,6 +16,7 @@ firebaseBom = "34.11.0"
 googleServices = "4.4.4"
 sceneview = "4.0.1"
 playServicesLocation = "21.3.0"
+libBullet = "21.2.1"
 
 
 
@@ -42,6 +43,7 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 sceneview = { group = "io.github.sceneview", name = "sceneview", version.ref = "sceneview" }
 google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+bullet-jme = { group = "com.github.stephengold", name = "Libbulletjme", version.ref = "libBullet" }
 
 
 [plugins]
