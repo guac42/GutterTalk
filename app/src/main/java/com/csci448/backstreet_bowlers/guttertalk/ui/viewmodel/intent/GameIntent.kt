@@ -1,8 +1,12 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.intent
 
 sealed class GameIntent : GutterTalkIntent() {
-    data object ThrowBall : GameIntent()
-    data object ResetPins : GameIntent()
+    data class ThrowBall(
+        val swipeVelocityX: Double,
+        val swipeVelocityZ: Double,
+        val swipeSpin: Double
+    ) : GameIntent()
+    data object NewGame : GameIntent()
 
     /**
      * @param pinsHit A set of the pins that were hit. The set will be null if

@@ -16,6 +16,7 @@ firebaseBom = "34.11.0"
 googleServices = "4.4.4"
 sceneview = "4.0.1"
 playServicesLocation = "21.3.0"
+ode4j = "0.5.4"
 
 
 
@@ -42,6 +43,7 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 sceneview = { group = "io.github.sceneview", name = "sceneview", version.ref = "sceneview" }
 google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+ode4j = { group = "org.ode4j", name = "core", version.ref = "ode4j" }
 
 
 [plugins]

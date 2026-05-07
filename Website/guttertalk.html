@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GutterTalk – CSCI 448</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0e0e0e;
+    --white: #f5f2ea;
+    --cream: #f0ece0;
+    --lane: #c8a96e;
+    --pin: #e63946;
+    --pin-dark: #9b1c26;
+    --wood: #7a5c3a;
+    --wood-light: #b8895a;
+    --muted: #6b6455;
+    --card-bg: #1a1714;
+    --card-border: #2e2820;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Lane stripe background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 59px,
+      rgba(255,255,255,0.015) 59px,
+      rgba(255,255,255,0.015) 60px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(to bottom, transparent, var(--black));
+    z-index: 1;
+  }
+
+  .pin-graphic {
+    font-size: 5rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 1rem;
+    animation: bobble 3s ease-in-out infinite;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 0 40px rgba(230, 57, 70, 0.3));
+  }
+
+  @keyframes bobble {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .hero-tag {
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--lane);
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
+    font-weight: 400;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 18vw, 13rem);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    color: var(--white);
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-title span {
+    color: var(--pin);
+    display: block;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 520px;
+    margin: 1.5rem auto 2.5rem;
+    position: relative;
+    z-index: 2;
+    font-weight: 300;
+  }
+
+  .hero-badges {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+  }
+
+  .badge {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--lane);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    font-weight: 400;
+  }
+
+  /* ─── SECTIONS ─── */
+  section {
+    position: relative;
+    z-index: 2;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--lane);
+    font-weight: 400;
+    margin-bottom: 0.75rem;
+  }
+
+  .section-heading {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    letter-spacing: 0.03em;
+    line-height: 1;
+    margin-bottom: 2rem;
+  }
+
+  /* ─── ABOUT ─── */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .about-text p {
+    color: #a89e8f;
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+  }
+
+  .about-text p strong {
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  .score-mockup {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .score-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .score-header span {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .score-header .live {
+    color: var(--pin);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--pin);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .frames {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 3px;
+    margin-bottom: 1rem;
+  }
+
+  .frame {
+    background: #141210;
+    border: 1px solid #2a2520;
+    border-radius: 4px;
+    padding: 4px 2px;
+    text-align: center;
+    font-size: 0.55rem;
+  }
+
+  .frame-num {
+    color: var(--muted);
+    margin-bottom: 2px;
+    font-size: 0.5rem;
+  }
+
+  .frame-rolls {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+    margin-bottom: 3px;
+  }
+
+  .roll {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.5rem;
+    font-weight: 500;
+  }
+
+  .roll.strike { background: var(--pin); color: white; }
+  .roll.spare { background: var(--lane); color: var(--black); }
+  .roll.open { background: #2a2520; color: var(--muted); }
+  .roll.empty { background: transparent; border: 1px dashed #2a2520; color: transparent; }
+
+  .frame-total {
+    color: var(--white);
+    font-size: 0.6rem;
+    font-weight: 500;
+  }
+
+  .score-total {
+    text-align: right;
+  }
+
+  .score-total .label { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; }
+  .score-total .number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    color: var(--pin);
+    line-height: 1;
+  }
+
+  /* ─── FEATURES ─── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .feature-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.75rem;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .feature-card:hover {
+    border-color: var(--wood);
+    transform: translateY(-4px);
+  }
+
+  .feature-icon {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .feature-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.05em;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+
+  .feature-card p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  /* ─── TEAM ─── */
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .team-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+
+  .avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--wood);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    color: var(--cream);
+    border: 2px solid var(--wood-light);
+  }
+
+  .team-card h3 {
+    font-weight: 500;
+    font-size: 1rem;
+    color: var(--white);
+    margin-bottom: 0.25rem;
+  }
+
+  .team-card p {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  /* ─── TECH ─── */
+  .tech-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .tech-pill {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--white);
+    font-size: 0.8rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 999px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    transition: border-color 0.2s;
+  }
+
+  .tech-pill:hover { border-color: var(--lane); color: var(--lane); }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--card-border), transparent);
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--card-border);
+  }
+
+  footer strong { color: var(--lane); font-weight: 400; }
+
+  /* ─── VIDEO ─── */
+  .video-placeholder {
+    background: var(--card-bg);
+    border: 1px dashed var(--wood);
+    border-radius: 16px;
+    padding: 5rem 2rem;
+    text-align: center;
+    margin-top: 2rem;
+  }
+
+  .video-icon {
+    font-size: 3rem;
+    color: var(--pin);
+    margin-bottom: 1rem;
+    opacity: 0.7;
+  }
+
+  .video-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.1em;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+
+  .video-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  /* ─── SCREENSHOTS ─── */
+  .screenshots-section { max-width: 1200px; }
+
+  .ss-group { margin-top: 3rem; }
+
+  .ss-group-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--wood-light);
+    font-weight: 400;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .ss-row {
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .ss-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .phone-frame {
+    background: #111;
+    border: 2px solid var(--card-border);
+    border-radius: 20px;
+    overflow: hidden;
+    width: 160px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .phone-frame:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.7);
+  }
+
+  .phone-frame img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .ss-caption {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .features-grid { grid-template-columns: 1fr; }
+    .team-grid { grid-template-columns: 1fr; }
+    .frames { grid-template-columns: repeat(5, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <p class="hero-tag">CSCI 448 · Mobile Application Development · Spring 2026</p>
+  <div class="pin-graphic">🎳</div>
+  <h1 class="hero-title">Gutter<span>Talk</span></h1>
+  <p class="hero-subtitle">The social bowling companion. Track your scores, talk your game, and prove your average isn't a fluke.</p>
+  <div class="hero-badges">
+    <span class="badge">Android</span>
+    <span class="badge">Kotlin</span>
+    <span class="badge">Jetpack Compose</span>
+    <span class="badge">Firebase</span>
+    <span class="badge">Backstreet Bowlers</span>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ABOUT -->
+<section>
+  <div class="about-grid">
+    <div class="about-text">
+      <p class="section-label">About the App</p>
+      <h2 class="section-heading">Bowl more.<br>Talk more.</h2>
+      <p>GutterTalk is a bowling app built by bowlers, for bowlers. Whether you're a casual Friday night lane renter or a league regular tracking your rolling average, GutterTalk has you covered.</p>
+      <p>Sign in with your account, log every frame, and <strong>actually remember what you scored</strong> last week. No more arguing about whose game was a fluke.</p>
+    </div>
+    <div>
+      <div class="score-mockup">
+        <div class="score-header">
+          <span>Live Game</span>
+          <span class="live"><span class="live-dot"></span> Frame 7</span>
+        </div>
+        <div class="frames">
+          <!-- Frames 1-10 mockup -->
+          <div class="frame">
+            <div class="frame-num">1</div>
+            <div class="frame-rolls">
+              <div class="roll strike">X</div>
+            </div>
+            <div class="frame-total">30</div>
+          </div>
+          <div class="frame">
+            <div class="frame-num">2</div>
+            <div class="frame-rolls">
+              <div class="roll strike">X</div>
+            </div>
+            <div class="frame-total">57</div>
+          </div>
+          <div class="frame">
+            <div class="frame-num">3</div>
+            <div class="frame-rolls">
+              <div class="roll open">7</div>
+              <div class="roll spare">/</div>
+            </div>
+            <div class="frame-total">77</div>
+          </div>
+          <div class="frame">
+            <div class="frame-num">4</div>
+            <div class="frame-rolls">
+              <div class="roll strike">X</div>
+            </div>
+            <div class="frame-total">104</div>
+          </div>
+          <div class="frame">
+            <div class="frame-num">5</div>
+            <div class="frame-rolls">
+              <div class="roll open">8</div>
+              <div class="roll open">1</div>
+            </div>
+            <div class="frame-total">113</div>
+          </div>
+          <div class="frame">
+            <div class="frame-num">6</div>
+            <div class="frame-rolls">
+              <div class="roll spare">9</div>
+              <div class="roll spare">/</div>
+            </div>
+            <div class="frame-total">130</div>
+          </div>
+          <div class="frame">
+            <div class="frame-num">7</div>
+            <div class="frame-rolls">
+              <div class="roll open">6</div>
+              <div class="roll empty">-</div>
+            </div>
+            <div class="frame-total">—</div>
+          </div>
+          <div class="frame">
+            <div class="frame-num">8</div>
+            <div class="frame-rolls">
+              <div class="roll empty">-</div>
+            </div>
+            <div class="frame-total">—</div>
+          </div>
+          <div class="frame">
+            <div class="frame-num">9</div>
+            <div class="frame-rolls">
+              <div class="roll empty">-</div>
+            </div>
+            <div class="frame-total">—</div>
+          </div>
+          <div class="frame">
+            <div class="frame-num">10</div>
+            <div class="frame-rolls">
+              <div class="roll empty">-</div>
+            </div>
+            <div class="frame-total">—</div>
+          </div>
+        </div>
+        <div class="score-total">
+          <div class="label">Current Score</div>
+          <div class="number">136</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FEATURES -->
+<section>
+  <p class="section-label">Features</p>
+  <h2 class="section-heading">What it does</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="feature-icon">🔐</span>
+      <h3>Secure Auth</h3>
+      <p>Firebase email/password authentication. Your account, your scores, your bragging rights — nobody else's.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🎯</span>
+      <h3>Score Tracking</h3>
+      <p>Log every frame with proper bowling math — strikes, spares, and 10th-frame bonuses all calculated correctly.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📊</span>
+      <h3>Game History</h3>
+      <p>Every game you've ever played, stored and accessible. Review your worst games in painful detail.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">💬</span>
+      <h3>Social Layer</h3>
+      <p>GutterTalk — because bowling is better when you can talk trash. Share scores and connect with other bowlers.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">⚡</span>
+      <h3>Real-time Sync</h3>
+      <p>Firebase-backed persistence means your data lives in the cloud and comes back when you need it.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📱</span>
+      <h3>Native Android</h3>
+      <p>Built with Jetpack Compose for a smooth, modern Android experience. No web wrappers, no compromises.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TEAM -->
+<section>
+  <p class="section-label">The Team</p>
+  <h2 class="section-heading">Backstreet Bowlers</h2>
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="avatar">DS</div>
+      <h3>Daniel Saelens</h3>
+      <p>Android Dev · Firebase Auth · Team Lead</p>
+    </div>
+    <div class="team-card">
+      <div class="avatar">BL</div>
+      <h3>Brian Luzar</h3>
+      <p>Game · UI Design</p>
+    </div>
+    <div class="team-card">
+      <div class="avatar">SM</div>
+      <h3>Sam Mantle</h3>
+      <p>Backend · Database Architecture</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- VIDEO DEMO -->
+<div class="divider"></div>
+<section>
+  <p class="section-label">Demo</p>
+  <h2 class="section-heading">See it in action</h2>
+  <div class="video-placeholder" id="video-section">
+    <!--
+    <div class="video-inner">
+      <div class="video-icon">▶</div>
+      <p class="video-text">Video demo coming soon</p>
+      <p class="video-sub">Drop a YouTube embed URL here once your recording is ready</p>
+    </div>
+    -->
+    <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+      <iframe src="assets/video.webm"
+        style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
+        allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- SCREENSHOTS -->
+<div class="divider"></div>
+<section class="screenshots-section">
+  <p class="section-label">Screenshots</p>
+  <h2 class="section-heading">Every screen</h2>
+
+  <div class="ss-group">
+    <h3 class="ss-group-label">Auth &amp; Home</h3>
+    <div class="ss-row">
+      <div class="ss-card">
+        <div class="phone-frame">
+          <img src="assets/screen-login.png" alt="Login screen" />
+        </div>
+        <p class="ss-caption">Login</p>
+      </div>
+      <div class="ss-card">
+        <div class="phone-frame">
+          <img src="assets/screen-home.png" alt="Home screen" />
+        </div>
+        <p class="ss-caption">Home</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ss-group">
+    <h3 class="ss-group-label">Leaderboards</h3>
+    <div class="ss-row">
+      <div class="ss-card">
+        <div class="phone-frame">
+          <img src="assets/screen-leaderboard.png" alt="Leaderboards menu" />
+        </div>
+        <p class="ss-caption">Leaderboards</p>
+      </div>
+      <div class="ss-card">
+        <div class="phone-frame">
+          <img src="assets/screen-global.png" alt="Global leaderboard" />
+        </div>
+        <p class="ss-caption">Global</p>
+      </div>
+      <div class="ss-card">
+        <div class="phone-frame">
+          <img src="assets/screen-local.png" alt="Local leaderboard" />
+        </div>
+        <p class="ss-caption">Local · Golden, CO</p>
+      </div>
+      <div class="ss-card">
+        <div class="phone-frame">
+          <img src="assets/screen-scores.png" alt="Top scores and lifetime stats" />
+        </div>
+        <p class="ss-caption">Top Scores</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ss-group">
+    <h3 class="ss-group-label">Settings</h3>
+    <div class="ss-row">
+      <div class="ss-card">
+        <div class="phone-frame">
+          <img src="assets/screen-settings.png" alt="Settings screen" />
+        </div>
+        <p class="ss-caption">Settings</p>
+      </div>
+      <div class="ss-card">
+        <div class="phone-frame">
+          <img src="assets/screen-music.png" alt="Music toggle" />
+        </div>
+        <p class="ss-caption">Toggle Music</p>
+      </div>
+      <div class="ss-card">
+        <div class="phone-frame">
+          <img src="assets/screen-insults.png" alt="Insults toggle" />
+        </div>
+        <p class="ss-caption">Toggle Insults 😈</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ss-group">
+    <h3 class="ss-group-label">Bowling Lane</h3>
+    <div class="ss-row">
+      <div class="ss-card">
+        <div class="phone-frame">
+          <img src="assets/game-standing.png" alt="Bowling lane - pins standing" />
+        </div>
+        <p class="ss-caption">Fresh rack</p>
+      </div>
+      <div class="ss-card">
+        <div class="phone-frame">
+          <img src="assets/game-falling.png" alt="Bowling lane - pins falling" />
+        </div>
+        <p class="ss-caption">Pins flying</p>
+      </div>
+      <div class="ss-card">
+        <div class="phone-frame">
+          <img src="assets/game-roll.png" alt="Bowling lane - mid roll" />
+        </div>
+        <p class="ss-caption">Mid-roll</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section>
+  <p class="section-label">Tech Stack</p>
+  <h2 class="section-heading">Built with</h2>
+  <div class="tech-list">
+    <span class="tech-pill">Kotlin</span>
+    <span class="tech-pill">Jetpack Compose</span>
+    <span class="tech-pill">Firebase Auth</span>
+    <span class="tech-pill">Firestore</span>
+    <span class="tech-pill">Room</span>
+    <span class="tech-pill">ViewModel</span>
+    <span class="tech-pill">MVI Architecture</span>
+    <span class="tech-pill">Coroutines</span>
+    <span class="tech-pill">Navigation Compose</span>
+    <span class="tech-pill">Android Studio</span>
+    <span class="tech-pill">CSCI 448 · Spring 2026</span>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>🎳 <strong>GutterTalk</strong> — Backstreet Bowlers · CSCI 448 · Colorado School of Mines · Spring 2026</p>
+  <!--
+  <p style="margin-top: 0.5rem;">If you're reading this on the course page in 2040, yes, it held up.</p>
+  -->
+</footer>
+
+</body>
+</html>
