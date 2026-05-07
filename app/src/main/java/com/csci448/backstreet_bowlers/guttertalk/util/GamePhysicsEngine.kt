@@ -1,7 +1,5 @@
 package com.csci448.backstreet_bowlers.guttertalk.util
 
-import android.util.Log
-import io.github.sceneview.math.localToWorldPosition
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.serialization.Serializable
 import org.ode4j.math.*
@@ -31,8 +29,8 @@ class GamePhysicsEngine {
 
     private val ballMass = 6.8 // mass in kg
     private val ballRestitution = 0.6
-    private val ballFriction = 0.15
-    private val pinStartZ = 18.29 // distance to center of front pin
+    private val ballFriction = 0.3
+    private val pinStartZ = 18.15 // distance to center of front pin
     private val pinMass = 1.53 // pin weight kg
     private val pinRestitution = 0.5
 
@@ -42,10 +40,12 @@ class GamePhysicsEngine {
         OdeHelper.initODE2(0)
 
         world = OdeHelper.createWorld().apply {
-            // erp           = 0.8     // error reduction (bounciness tuning)
+            erp           = 0.2     // error reduction (bounciness tuning)
             cfm           = 1e-5    // constraint force mixing (softness)
             quickStepNumIterations = 20
             setGravity(DVector3(0.0, -9.8, 0.0))
+            linearDamping = 0.02
+            angularDamping = 0.02
         }
 
         space = OdeHelper.createHashSpace()
@@ -58,43 +58,56 @@ class GamePhysicsEngine {
         resetPins()
     }
 
-    suspend fun reset() {
+    suspend fun safeReset() {
         semaphore.acquire()
 
-        ballBody.setPosition(0.0, BALL_RADIUS, -LANE_LENGTH/2)
-        ballBody.linearVel = DVector3()
-        ballBody.angularVel = DVector3()
         resetPins()
+        resetBall()
+
+        semaphore.release()
+    }
+
+    suspend fun safeResetPins() {
+        semaphore.acquire()
+
+        resetPins()
+
+        semaphore.release()
+    }
+
+    suspend fun safeResetBall() {
+        semaphore.acquire()
+
+        resetBall()
 
         semaphore.release()
     }
 
     private fun setupLane() {
         OdeHelper.createBox(space, DVector3(LANE_WIDTH, LANE_THICKNESS, LANE_LENGTH)).apply {
-            setPosition(0.0, -LANE_THICKNESS/2, -LANE_LENGTH/2)
+            setPosition(0.0, -LANE_THICKNESS/2, LANE_LENGTH/2)
         }
 
         // Create a world boundary plane at y=-0.5
-        OdeHelper.createPlane(space, 0.0, 1.0, 0.0, -0.5)
+        OdeHelper.createPlane(space, 0.0, 1.0, 0.0, -1.0)
     }
 
     private fun setupGutters() {
         OdeHelper.createBox(space, DVector3(GUTTER_WIDTH, LANE_THICKNESS, LANE_LENGTH)).apply {
-            setPosition(-LANE_WIDTH/2 - GUTTER_WIDTH/2, -LANE_THICKNESS/2-GUTTER_DEPTH, -LANE_LENGTH/2)
+            setPosition(-LANE_WIDTH/2 - GUTTER_WIDTH/2, -LANE_THICKNESS/2-GUTTER_DEPTH, LANE_LENGTH/2)
         }
         OdeHelper.createBox(space, DVector3(GUTTER_WIDTH, LANE_THICKNESS, LANE_LENGTH)).apply {
-            setPosition(LANE_WIDTH/2 + GUTTER_WIDTH/2, -LANE_THICKNESS/2-GUTTER_DEPTH, -LANE_LENGTH/2)
+            setPosition(LANE_WIDTH/2 + GUTTER_WIDTH/2, -LANE_THICKNESS/2-GUTTER_DEPTH, LANE_LENGTH/2)
         }
     }
 
     private fun setupBall() {
         ballBody = OdeHelper.createBody(world).apply {
-            setPosition(0.0, BALL_RADIUS, -LANE_LENGTH/2)
+            setPosition(0.0, BALL_RADIUS, LANE_LENGTH/2)
             mass = OdeHelper.createMass().also { m ->
                 m.setSphereTotal(ballMass, BALL_RADIUS)
                 this.mass = m
             }
-            angularDamping = 0.05
         }
         ballGeom = OdeHelper.createSphere(space, BALL_RADIUS).apply {
             body = ballBody
@@ -106,17 +119,18 @@ class GamePhysicsEngine {
             val body = OdeHelper.createBody(world).apply {
                 mass = OdeHelper.createMass().also { m ->
                     m.setCylinderTotal(pinMass, 2, PIN_RADIUS, PIN_HEIGHT)
-                    this.mass = m
                 }
-                angularDamping = 0.1
             }
             // Capsule geom: good approximation for a pin shape
-            val geom = OdeHelper.createCapsule(space, PIN_RADIUS, PIN_HEIGHT-2*PIN_RADIUS).apply {
+            val geom = OdeHelper.createCapsule(space, PIN_RADIUS, (PIN_HEIGHT-2.0*PIN_RADIUS)).apply {
                 val rot = DMatrix3()
                 OdeMath.dRFromAxisAndAngle(rot, 1.0, 0.0, 0.0, Math.PI/2)
                 this.rotation = rot
                 this.body = body
             }
+            /*val geom = OdeHelper.createCylinder(space, PIN_RADIUS, PIN_HEIGHT)
+            geom.body = body*/
+
             pinBodies.add(body)
             pinGeoms.add(geom)
         }
@@ -124,35 +138,43 @@ class GamePhysicsEngine {
 
     private fun resetPins() {
         val spacing = 0.305 // 12 inches between pin centers
+        val verticalOffset = 0.0
         val pinFormation = listOf(
             // Row 1
-            DVector3(0.0,         PIN_HEIGHT/2 + 0.2, -pinStartZ),
+            DVector3(0.0,         PIN_HEIGHT/2 + verticalOffset, pinStartZ),
             // Row 2
-            DVector3(-spacing/2,  PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 0.866),
-            DVector3( spacing/2,  PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 0.866),
+            DVector3(-spacing/2,  PIN_HEIGHT/2 + verticalOffset, pinStartZ + spacing * 0.866),
+            DVector3( spacing/2,  PIN_HEIGHT/2 + verticalOffset, pinStartZ + spacing * 0.866),
             // Row 3
-            DVector3(-spacing,    PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 1.732),
-            DVector3(0.0,         PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 1.732),
-            DVector3( spacing,    PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 1.732),
+            DVector3(-spacing,    PIN_HEIGHT/2 + verticalOffset, pinStartZ + spacing * 1.732),
+            DVector3(0.0,         PIN_HEIGHT/2 + verticalOffset, pinStartZ + spacing * 1.732),
+            DVector3( spacing,    PIN_HEIGHT/2 + verticalOffset, pinStartZ + spacing * 1.732),
             // Row 4
-            DVector3(-spacing*1.5, PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 2.598),
-            DVector3(-spacing/2,   PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 2.598),
-            DVector3( spacing/2,   PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 2.598),
-            DVector3( spacing*1.5, PIN_HEIGHT/2 + 0.2, -pinStartZ - spacing * 2.598)
+            DVector3(-spacing*1.5, PIN_HEIGHT/2 + verticalOffset, pinStartZ + spacing * 2.598),
+            DVector3(-spacing/2,   PIN_HEIGHT/2 + verticalOffset, pinStartZ + spacing * 2.598),
+            DVector3( spacing/2,   PIN_HEIGHT/2 + verticalOffset, pinStartZ + spacing * 2.598),
+            DVector3( spacing*1.5, PIN_HEIGHT/2 + verticalOffset, pinStartZ + spacing * 2.598)
         )
 
         pinFormation.forEachIndexed { index, pos ->
             pinBodies[index].setPosition(pos.get0(), pos.get1(), pos.get2())
+            pinBodies[index].rotation = DMatrix3().also { OdeMath.dRSetIdentity(it) }
             pinBodies[index].linearVel = DVector3()
             pinBodies[index].angularVel = DVector3()
         }
     }
 
+    private fun resetBall() {
+        ballBody.setPosition(0.0, BALL_RADIUS, LANE_LENGTH/2)
+        ballBody.linearVel = DVector3()
+        ballBody.angularVel = DVector3()
+    }
+
     suspend fun throwBall(velocityX: Double, velocityZ: Double, spinY: Double) {
         semaphore.acquire()
 
-        ballBody.setPosition(0.0, BALL_RADIUS, -LANE_LENGTH/2)
-        ballBody.setLinearVel(velocityX, 0.0, -velocityZ)
+        ballBody.setPosition(0.0, BALL_RADIUS, LANE_LENGTH/2)
+        ballBody.setLinearVel(velocityX, 0.0, velocityZ)
         ballBody.setAngularVel(0.0, spinY, 0.0)
 
         semaphore.release()
@@ -163,10 +185,21 @@ class GamePhysicsEngine {
 
         space.collide(null, nearCallback)
         world.quickStep(deltaTime)
+        contactGroup.empty()
 
         semaphore.release()
 
         return buildSnapshot()
+    }
+
+    fun settled(): Boolean {
+        return ballBody.linearVel.length() < 0.1
+    }
+
+    fun knocked(): Int {
+        return pinBodies.count {
+            it.position.get1() < 0.0
+        }
     }
 
     private val nearCallback = DGeom.DNearCallback { _, o1, o2 ->
@@ -176,18 +209,21 @@ class GamePhysicsEngine {
         // Skip if both geoms are connected by a joint already
         if (b1 != null && b2 != null && OdeHelper.areConnected(b1, b2)) return@DNearCallback
 
-        val MAX_CONTACTS = 10;
+        val MAX_CONTACTS = 8;
         val contacts = DContactBuffer(MAX_CONTACTS)
 
-        val n = OdeHelper.collide(o1, o2, MAX_CONTACTS, contacts.geomBuffer)
-        repeat(n) { i ->
+        repeat(MAX_CONTACTS) { i ->
             contacts[i].surface.apply {
-                mode      = OdeConstants.dContactBounce or OdeConstants.dContactSoftCFM
-                mu        = 0.6          // friction
-                bounce    = 0.35         // restitution
+                mode      = OdeConstants.dContactBounce or OdeConstants.dContactSoftCFM or OdeConstants.dContactApprox1
+                mu        = ballFriction          // friction
+                bounce    = 0.3          // restitution
                 bounce_vel = 0.1         // minimum velocity for bounce
                 soft_cfm = 0.001
             }
+        }
+
+        val n = OdeHelper.collide(o1, o2, MAX_CONTACTS, contacts.geomBuffer)
+        repeat(n) { i ->
             OdeHelper.createContactJoint(world, contactGroup, contacts[i]).apply {
                 attach(b1, b2)
             }
@@ -203,12 +239,18 @@ class GamePhysicsEngine {
             val rot = body.quaternion
             val vel = body.linearVel
             val ang = body.angularVel
+
+            /*val res = DVector3()
+            val up = DVector3(0.0, 1.0, 0.0)
+            OdeMath.dMultiply1(res, body.rotation, up)
+            val dot = OdeMath.dCalcVectorDot3(res, up)*/
+
             PinSnapshot3D(
                 id     = i,
                 posX   = pos.get0().toFloat(), posY = pos.get1().toFloat(), posZ = pos.get2().toFloat(),
                 rotX   = rot.get1().toFloat(), rotY = rot.get2().toFloat(),
                 rotZ   = rot.get3().toFloat(), rotW = rot.get0().toFloat(), // ode4j: w,x,y,z order
-                isSettled = vel.length() < 0.05 && ang.length() < 0.05
+                isSettled = OdeMath.dCalcVectorLengthSquare3(vel) < 0.1
             )
         }
 

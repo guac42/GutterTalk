@@ -1,5 +1,6 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.navigation.specs
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,7 +17,6 @@ import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.GutterTalkViewMode
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.SettingsViewModel
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.collectInLaunchedEffect
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.effect.GameEffect
-import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.intent.GameIntent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 
@@ -59,25 +59,24 @@ object GameScreenSpec : IScreenSpec {
         effects.collectInLaunchedEffect {
             when(it) {
                 is GameEffect.Insult -> {
-                    Toast.makeText(context, it.insult, Toast.LENGTH_LONG).show()
+                    Log.d(LOG_TAG, "Collecting insult effect")
+                    if (settingsState.isInsultsOn) {
+                        Toast.makeText(context, it.insult, Toast.LENGTH_LONG).show()
+                    }
                 }
+                GameEffect.GameOver -> {}
                 null -> {}
             }
         }
 
         GutterTalkLaneScreen(
             modifier = modifier,
-            isInsultsOn = settingsState.isInsultsOn,
-            onBallSettled = {
-                dispatcher.invoke(GameIntent.BallSettled(it))
-            },
             onThrow = {
                 dispatcher.invoke(it)
             },
-            onReset = {
-                dispatcher.invoke(GameIntent.ResetPins)
-            },
-            physicsSnapshot = state.physicsSnapshot
+            physicsSnapshot = state.physicsSnapshot,
+            rolls = state.rolls,
+            frame = state.currentFrame
         )
     }
 

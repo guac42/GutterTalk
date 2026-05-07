@@ -12,16 +12,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.csci448.backstreet_bowlers.guttertalk.data.database.BowlingScore
+import com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.scores.GutterTalkScoreboard
+import com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.scores.ScoreCalculator
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.intent.GameIntent
 import com.csci448.backstreet_bowlers.guttertalk.util.GamePhysicsEngine.Companion.BALL_RADIUS
 import com.csci448.backstreet_bowlers.guttertalk.util.GamePhysicsEngine.Companion.GUTTER_DEPTH
@@ -33,34 +31,33 @@ import com.csci448.backstreet_bowlers.guttertalk.util.GamePhysicsEngine.Companio
 import com.csci448.backstreet_bowlers.guttertalk.util.GamePhysicsEngine.Companion.PIN_RADIUS
 import com.csci448.backstreet_bowlers.guttertalk.util.PhysicsSnapshot3D
 import com.csci448.backstreet_bowlers.guttertalk.util.PinSnapshot3D
-import com.google.android.filament.LightManager
 import dev.romainguy.kotlin.math.Quaternion
-import dev.romainguy.kotlin.math.rotation
 import io.github.sceneview.SceneView
 import io.github.sceneview.math.Position
 import io.github.sceneview.math.Scale
+import io.github.sceneview.math.toRotation
+import io.github.sceneview.rememberCameraManipulator
 import io.github.sceneview.rememberCameraNode
 import io.github.sceneview.rememberCollisionSystem
 import io.github.sceneview.rememberEngine
-import io.github.sceneview.rememberEnvironmentLoader
 import io.github.sceneview.rememberMaterialLoader
 import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberView
 
+private const val LOG_TAG = "448.LaneScreenSpec"
+
 @Composable
 fun GutterTalkLaneScreen(
     modifier: Modifier = Modifier,
-    onBallSettled: (Set<Int>?) -> Unit,
     onThrow: (GameIntent.ThrowBall) -> Unit,
-    onReset: () -> Unit,
     physicsSnapshot: PhysicsSnapshot3D?,
-    isInsultsOn: Boolean
+    rolls: List<Int>,
+    frame: Int
 ) {
     val engine = rememberEngine()
     val engineView = rememberView(engine)
     val modelLoader = rememberModelLoader(engine)
     val materialLoader = rememberMaterialLoader(engine)
-    val environmentLoader = rememberEnvironmentLoader(engine)
     val collisionSystem = rememberCollisionSystem(engineView)
     val gestureHandler = remember { GameGestureHandler(onThrow) }
 
@@ -74,16 +71,9 @@ fun GutterTalkLaneScreen(
         remember(materialLoader) { materialLoader.createColorInstance(Color(0xFF4CAF50)) }
 
     val cameraNode = rememberCameraNode(engine) {
-        position = Position(0f, 8f, 1f)
-        lookAt(Position(0f, 0f, -18f))
+        position = Position(0f, 4f, 4f)
+        lookAt(Position(0f, 0f, 16f))
     }
-
-    // Physics state
-    val bodies = remember { mutableStateListOf<PhysicsBody>() }
-    var paused by remember { mutableStateOf(false) }
-    var score by remember { mutableIntStateOf(0) }
-    val gravity = -9.81f
-    val bounciness = 0.7f
 
     Box(modifier = modifier.fillMaxSize()) {
         SceneView(
@@ -93,20 +83,12 @@ fun GutterTalkLaneScreen(
             collisionSystem = collisionSystem,
             cameraNode = cameraNode,
             cameraManipulator = null,
-            /*environment = environmentLoader.createHDREnvironment(
-                assetFileLocation = "assets/environments/neutral.hdr"
-            )!!,*/
             onGestureListener = gestureHandler,
-            /*onFrame = { frameTimeNanos ->
-                if (!paused) {
-                    updatePhysics(bodies, gravity, bounciness, frameTimeNanos*1e6f)
-                }
-            }*/
         ) {
             CubeNode(
                 materialInstance = laneMaterial,
                 size = Scale(LANE_WIDTH.toFloat(), LANE_THICKNESS.toFloat(), LANE_LENGTH.toFloat()),
-                position = Position(0f, -LANE_THICKNESS.toFloat() / 2, -LANE_LENGTH.toFloat() / 2)
+                position = Position(0f, -LANE_THICKNESS.toFloat() / 2, LANE_LENGTH.toFloat() / 2)
             )
 
             // Lane gutters
@@ -120,7 +102,7 @@ fun GutterTalkLaneScreen(
                 position = Position(
                     (-LANE_WIDTH / 2 - GUTTER_WIDTH / 2).toFloat(),
                     (-LANE_THICKNESS.toFloat() / 2 - GUTTER_DEPTH).toFloat(),
-                    -LANE_LENGTH.toFloat() / 2
+                    LANE_LENGTH.toFloat() / 2
                 )
             )
             CubeNode(
@@ -133,7 +115,7 @@ fun GutterTalkLaneScreen(
                 position = Position(
                     (LANE_WIDTH / 2 + GUTTER_WIDTH / 2).toFloat(),
                     (-LANE_THICKNESS.toFloat() / 2 - GUTTER_DEPTH).toFloat(),
-                    -LANE_LENGTH.toFloat() / 2
+                    LANE_LENGTH.toFloat() / 2
                 )
             )
 
@@ -144,37 +126,16 @@ fun GutterTalkLaneScreen(
                         radius = PIN_RADIUS.toFloat(),
                         height = PIN_HEIGHT.toFloat(),
                         position = pin.toPosition(),
-                    ).apply {
-                        rotation(pin.toQuaternion())
-                    }
+                        rotation = pin.toRotation()
+                    )
                 }
                 SphereNode(
                     materialInstance = ballMaterial,
                     radius = BALL_RADIUS.toFloat(),
                     position = physicsSnapshot.toPosition(),
-                ).apply {
-                    rotation(physicsSnapshot.toQuaternion())
-                }
+                    rotation = physicsSnapshot.toQuaternion().toRotation()
+                )
             }
-
-            // Lighting
-            LightNode(
-                type = LightManager.Type.DIRECTIONAL,
-                apply = {
-                    intensity(100_000f)
-                    color(1.0f, 0.98f, 0.95f)
-                    direction(0.3f, -1f, -0.4f)
-                }
-            )
-
-            LightNode(
-                type = LightManager.Type.DIRECTIONAL,
-                apply = {
-                    intensity(40_000f)
-                    color(0.9f, 0.9f, 1.0f)
-                    direction(-0.3f, -0.5f, 0.5f)
-                }
-            )
         }
     }
 
@@ -182,8 +143,28 @@ fun GutterTalkLaneScreen(
         tonalElevation = 2.dp,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text("Controls", style = MaterialTheme.typography.titleMedium)
+        val rollsFilled = rolls.toMutableList<Int?>().apply {
+            repeat(21-rolls.size) {
+                add(null)
+            }
+        }
+        val scoreCard = BowlingScore(
+            rolls = rollsFilled
+        )
+        val scores: MutableList<Int?> = mutableListOf()
+        repeat(10) { i ->
+            scores += (ScoreCalculator(scoreCard, i+1))
+        }
+
+        GutterTalkScoreboard(
+            modifier = Modifier.fillMaxWidth(),
+            scoreCard = BowlingScore(
+                rolls = rollsFilled,
+                scores = scores
+            )
+        )
+        /*Column(modifier = Modifier.padding(16.dp)) {
+            Text("Controls ${physicsSnapshot?.pins?.count { it.isSettled }}", style = MaterialTheme.typography.titleMedium)
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -222,15 +203,19 @@ fun GutterTalkLaneScreen(
                     horizontalArrangement = Arrangement.SpaceAround,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Button(onClick = { paused = !paused }) {
-                        Text(if (paused) "Resume" else "Pause")
+                    Button(onClick = {
+                        physicsSnapshot?.pins?.forEach {
+                            Log.d(LOG_TAG, it.posY.toString())
+                        }
+                    }) {
+                        Text("Test")
                     }
                     Button(onClick = onReset) {
                         Text("Reset")
                     }
                 }
             }
-        }
+        }*/
     }
 }
 
@@ -253,12 +238,12 @@ fun PinSnapshot3D.toPosition() = Position(
     z = posZ
 )
 
-fun PinSnapshot3D.toQuaternion() = Quaternion(
+fun PinSnapshot3D.toRotation() = Quaternion(
     x = rotX,
     y = rotY,
     z = rotZ,
     w = rotW
-)
+).toRotation()
 
 @Preview
 @Composable
