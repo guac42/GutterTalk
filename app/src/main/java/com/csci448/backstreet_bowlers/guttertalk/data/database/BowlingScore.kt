@@ -2,6 +2,7 @@ package com.csci448.backstreet_bowlers.guttertalk.data.database
 
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.IgnoreExtraProperties
+import com.google.firebase.firestore.PropertyName
 import java.util.Date
 
 /**
@@ -15,6 +16,7 @@ import java.util.Date
 @IgnoreExtraProperties
 data class BowlingScore (
     @DocumentId val id: String = "",
+    @get:PropertyName("PlayerID")
     val PlayerID: String = "",
     val rolls: List<Int?> = List(21){null},
     val scores: List<Int?> = List(10){null},
