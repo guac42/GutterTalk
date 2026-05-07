@@ -15,8 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.csci448.backstreet_bowlers.guttertalk.R
 import com.csci448.backstreet_bowlers.guttertalk.data.database.BowlingScore
 import com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.scores.GutterTalkScoreboard
 import com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.scores.ScoreCalculator
@@ -36,7 +38,6 @@ import io.github.sceneview.SceneView
 import io.github.sceneview.math.Position
 import io.github.sceneview.math.Scale
 import io.github.sceneview.math.toRotation
-import io.github.sceneview.rememberCameraManipulator
 import io.github.sceneview.rememberCameraNode
 import io.github.sceneview.rememberCollisionSystem
 import io.github.sceneview.rememberEngine
@@ -44,15 +45,15 @@ import io.github.sceneview.rememberMaterialLoader
 import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberView
 
-private const val LOG_TAG = "448.LaneScreenSpec"
-
 @Composable
 fun GutterTalkLaneScreen(
     modifier: Modifier = Modifier,
     onThrow: (GameIntent.ThrowBall) -> Unit,
     physicsSnapshot: PhysicsSnapshot3D?,
     rolls: List<Int>,
-    frame: Int
+    frame: Int,
+    onBack: () -> Unit,
+    onPlayAgain: () -> Unit
 ) {
     val engine = rememberEngine()
     val engineView = rememberView(engine)
@@ -73,6 +74,15 @@ fun GutterTalkLaneScreen(
     val cameraNode = rememberCameraNode(engine) {
         position = Position(0f, 4f, 4f)
         lookAt(Position(0f, 0f, 16f))
+    }
+
+    if (frame == 11) {
+        GamePlayAgainDialog(
+            onDismissRequest = onBack,
+            onConfirmation = onPlayAgain,
+            dialogTitle = stringResource(R.string.lane_dialog_title),
+            dialogText = stringResource(R.string.lane_dialog_text)
+        )
     }
 
     Box(modifier = modifier.fillMaxSize()) {

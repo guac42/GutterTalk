@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.math.max
-import kotlin.math.min
 
 class GameViewModel
 internal constructor(
@@ -78,17 +77,17 @@ internal constructor(
                                 val knocked = max(0, physics.knocked() - current.knockedPins)
                                 scores.add(knocked)
                                 handlePinsHit(knocked)
-                                if (current.currentFrame < 9 || physics.knocked() == 10) {
+                                if (current.currentFrame < 10 || physics.knocked() == 10) {
                                     physics.safeReset()
                                 } else {
                                     physics.safeResetBall()
                                 }
                                 current.copy(
                                     ballInMotion = false,
-                                    throwInFrame = if (current.currentFrame+1 != 10) 0 else current.throwInFrame,
-                                    knockedPins = if (current.currentFrame+1 != 10) 0 else current.knockedPins,
+                                    throwInFrame = if (current.currentFrame < 10) 0 else 2,
+                                    knockedPins = if (current.currentFrame < 10) 0 else physics.knocked(),
                                     rolls = scores,
-                                    currentFrame = if (current.currentFrame+1 != 10) current.currentFrame+1 else current.currentFrame
+                                    currentFrame = if (current.currentFrame < 10) current.currentFrame+1 else current.currentFrame
                                 )
                             }
                             2 -> {
@@ -133,7 +132,19 @@ internal constructor(
             }
             is GameIntent.BallSettled -> {
             }
-            is GameIntent.ResetPins -> {
+            is GameIntent.NewGame -> {
+                viewModelScope.launch {
+                    physics.safeReset()
+                    _stateFlow.update { current ->
+                        current.copy(
+                            ballInMotion = false,
+                            knockedPins = 0,
+                            rolls = emptyList(),
+                            currentFrame = 1,
+                            throwInFrame = 0
+                        )
+                    }
+                }
             }
         }
     }
@@ -146,12 +157,6 @@ internal constructor(
                 in 3..9 -> _effectFlow.emit(GameEffect.Insult("I guess you took the whole some is better than none to heart huh?"))
                 10 -> _effectFlow.emit(GameEffect.Insult("Wow, even a broken clock gets it right twice a day."))
             }
-        }
-    }
-
-    private fun handleGameOver() {
-        viewModelScope.launch {
-            _effectFlow.emit(GameEffect.GameOver)
         }
     }
 }

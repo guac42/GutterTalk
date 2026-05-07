@@ -19,6 +19,7 @@ import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.collectInLaunchedE
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.effect.GameEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.intent.GameIntent
 
 object GameScreenSpec : IScreenSpec {
     private const val LOG_TAG = "448.LaneScreenSpec"
@@ -76,7 +77,13 @@ object GameScreenSpec : IScreenSpec {
             },
             physicsSnapshot = state.physicsSnapshot,
             rolls = state.rolls,
-            frame = state.currentFrame
+            frame = state.currentFrame,
+            onBack = {
+                navController.popBackStack()
+            },
+            onPlayAgain = {
+                dispatcher.invoke(GameIntent.NewGame)
+            }
         )
     }
 

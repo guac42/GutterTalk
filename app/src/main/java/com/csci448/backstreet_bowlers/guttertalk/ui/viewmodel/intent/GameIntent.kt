@@ -6,7 +6,7 @@ sealed class GameIntent : GutterTalkIntent() {
         val swipeVelocityZ: Double,
         val swipeSpin: Double
     ) : GameIntent()
-    data object ResetPins : GameIntent()
+    data object NewGame : GameIntent()
 
     /**
      * @param pinsHit A set of the pins that were hit. The set will be null if

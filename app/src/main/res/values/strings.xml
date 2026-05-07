@@ -20,6 +20,10 @@
 
     <!-- lane -->
     <string name="lane_screen_title">Bowling Lane</string>
+    <string name="lane_dialog_title">Play Again?</string>
+    <string name="lane_dialog_text">Are you ready for more?</string>
+    <string name="lane_dialog_again">Play Again</string>
+    <string name="lane_dialog_leave">Leave</string>
 
     <!-- leaderboard -->
     <string name="leaderboard_screen_title">LeaderBoards</string>
