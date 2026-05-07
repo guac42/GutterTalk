@@ -30,6 +30,7 @@
     <string name="leaderboard_screen_scores">User Statistics</string>
     <string name="leaderboard_screen_local">Local Leaderboard</string>
     <string name="leaderboard_screen_global">Global Leaderboard</string>
+    <string name="leaderboard_login_message">You must log in to access stats and leaderboards</string>
 
     <!-- scores -->
     <string name="scores_screen_title">Top Scores</string>

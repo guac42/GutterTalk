@@ -19,6 +19,7 @@ import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.ScoresViewModel
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.collectInLaunchedEffect
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.effect.LeaderboardEffect
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.intent.LeaderboardIntent
+import com.google.firebase.auth.FirebaseAuth
 
 object LeaderboardScreenSpec : IScreenSpec {
     private const val LOG_TAG = "448.LeaderboardScreenSpec"
@@ -56,6 +57,8 @@ object LeaderboardScreenSpec : IScreenSpec {
             }
         }
 
+        val loggedIn = FirebaseAuth.getInstance().currentUser != null
+
         // This code is fucked, im not sure where else to invoke this intent
 //        Log.d(LOG_TAG, "Current state of enabled value is: ${state.isLocationAvailable}")
         dispatcher.invoke(LeaderboardIntent.RefreshPermissionStatus)
@@ -65,6 +68,7 @@ object LeaderboardScreenSpec : IScreenSpec {
         GutterTalkLeaderboardScreen(
             modifier = modifier,
             isLocationEnabled = state.isLocationAvailable,
+            isUserLoggedIn = loggedIn,
             onUserScoresClick = {
                 Log.d(LOG_TAG, "User Scores Callback")
                 navController.navigate(ScoresScreenSpec.route)

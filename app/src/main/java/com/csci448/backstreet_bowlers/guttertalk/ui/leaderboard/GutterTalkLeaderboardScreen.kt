@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +19,7 @@ import com.csci448.backstreet_bowlers.guttertalk.ui.common.GutterTalkButton
 fun GutterTalkLeaderboardScreen(
     modifier: Modifier = Modifier,
     isLocationEnabled: Boolean,
+    isUserLoggedIn: Boolean,
     onUserScoresClick: () -> Unit,
     onGlobalLeaderboardClick: () -> Unit,
     onLocalLeaderboardClick: () -> Unit
@@ -32,18 +34,24 @@ fun GutterTalkLeaderboardScreen(
     ) {
         GutterTalkButton(
             text = stringResource(R.string.leaderboard_screen_scores),
-            onClick = onUserScoresClick
+            onClick = onUserScoresClick,
+            enabled = isUserLoggedIn
         )
         GutterTalkButton(
             text = stringResource(R.string.leaderboard_screen_global),
             onClick = onGlobalLeaderboardClick,
-            enabled = true
+            enabled = isUserLoggedIn
         )
         GutterTalkButton(
             text = stringResource(R.string.leaderboard_screen_local),
             onClick = onLocalLeaderboardClick,
-            enabled = isLocationEnabled
+            enabled = isLocationEnabled && isUserLoggedIn
         )
+        if (!isUserLoggedIn) {
+            Text(
+                text = stringResource(R.string.leaderboard_login_message)
+            )
+        }
     }
 }
 
@@ -54,6 +62,7 @@ fun GutterTalkLeaderboardScreenPreview() {
         onUserScoresClick = {},
         onGlobalLeaderboardClick = {},
         onLocalLeaderboardClick = {},
-        isLocationEnabled = true
+        isLocationEnabled = true,
+        isUserLoggedIn = true
     )
 }
