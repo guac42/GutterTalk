@@ -37,6 +37,11 @@ class SettingsViewModel
         setVolume(_savedState.musicVolume, _savedState.musicVolume)
         Log.d(LOG_TAG, "MediaPlayer created: $this")
     }
+    init {
+        if (_savedState.isMusicOn) {
+            mediaPlayer.start()
+        }
+    }
 
 
     override fun handleIntent(intent: SettingsIntent) {
