@@ -103,22 +103,22 @@ class LeaderboardViewModel(
                         _stateFlow.update { it.copy(isLocationAvailable = true) }
                         startLocationUpdates()
                         val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
-                            viewModelScope.launch {
-                                try {
-                                    // Priority ensures we get an accurate enough result for city/state
-                                    val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
-                                    fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                                        if (location != null && user != null) {
-                                            updateCityState(location, user.uid)
-                                        }
+                        viewModelScope.launch {
+                            try {
+                                // Priority ensures we get an accurate enough result for city/state
+                                val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+                                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                                    if (location != null && user != null) {
+                                        updateCityState(location, user.uid)
                                     }
-                                } catch (e: Exception) {
-                                    Log.e(
-                                        "448.LeaderboardViewModel",
-                                        "Failed to get current location",
-                                        e
-                                    )
                                 }
+                            } catch (e: Exception) {
+                                Log.e(
+                                    "448.LeaderboardViewModel",
+                                    "Failed to get current location",
+                                    e
+                                )
+                            }
                         }
                     }
                     // Update the state so the button enables

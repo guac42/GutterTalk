@@ -78,10 +78,12 @@ object GameScreenSpec : IScreenSpec {
             physicsSnapshot = state.physicsSnapshot,
             rolls = state.rolls,
             frame = state.currentFrame,
-            onBack = {
+            onBack = { gameState ->
+                dispatcher.invoke(GameIntent.UpdateScore(gameState))
                 navController.popBackStack()
             },
-            onPlayAgain = {
+            onPlayAgain = { gameState ->
+                dispatcher.invoke(GameIntent.UpdateScore(gameState))
                 dispatcher.invoke(GameIntent.NewGame)
             }
         )

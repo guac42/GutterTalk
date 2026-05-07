@@ -35,7 +35,10 @@ class GutterTalkViewModelFactory : ViewModelProvider.Factory {
             isAssignableFrom(GameViewModel::class.java) -> {
                 Log.d(LOG_TAG, "creating GameViewModel")
                 val savedStateHandle = extras.createSavedStateHandle()
-                GameViewModel(savedStateHandle)
+                GameViewModel(savedStateHandle,
+                    userRepository = userRepository,
+                    bowlingRepository = BowlingScoreRepository()
+                    )
             }
 
             isAssignableFrom(SettingsViewModel::class.java) ->{

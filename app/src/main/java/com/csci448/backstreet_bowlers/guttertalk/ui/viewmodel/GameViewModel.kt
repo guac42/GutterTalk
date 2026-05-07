@@ -5,6 +5,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.serialization.saved
 import androidx.lifecycle.viewModelScope
+import com.csci448.backstreet_bowlers.guttertalk.data.database.BowlingScore
+import com.csci448.backstreet_bowlers.guttertalk.data.database.BowlingScoreRepository
+import com.csci448.backstreet_bowlers.guttertalk.data.database.UserRepository
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.effect.GameEffect
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.intent.GameIntent
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.state.GameState
@@ -23,6 +26,8 @@ import kotlin.math.max
 class GameViewModel
 internal constructor(
     savedStateHandle: SavedStateHandle,
+    private val userRepository: UserRepository,
+    private val bowlingRepository: BowlingScoreRepository
 ) : ViewModel(), IViewModelContract<GameState, GameIntent, GameEffect> {
 
     companion object {
@@ -132,6 +137,21 @@ internal constructor(
             }
             is GameIntent.BallSettled -> {
             }
+            is GameIntent.UpdateScore -> {
+                viewModelScope.launch {
+                    Log.d(LOG_TAG, "Triggering update score")
+                    bowlingRepository.addScore(
+                        intent.gameState
+                    )
+                    userRepository.updateUserStats(
+                        userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid!!,
+                        score = intent.gameState.score!!,
+                        strikes = calcStrikes(intent.gameState.rolls),
+                        spares = calcSpares(intent.gameState.rolls)
+
+                    )
+                }
+            }
             is GameIntent.NewGame -> {
                 viewModelScope.launch {
                     physics.safeReset()
@@ -158,5 +178,45 @@ internal constructor(
                 10 -> _effectFlow.emit(GameEffect.Insult("Wow, even a broken clock gets it right twice a day."))
             }
         }
+    }
+
+    private fun calcStrikes(rolls: List<Int?>): Int{
+        var strikes = 0
+        var rollIndex = 0
+
+        // Standard bowling game has 10 frames
+        for (frame in 1..10) {
+            if (rollIndex >= rolls.size) break
+
+            val firstRoll = rolls[rollIndex] ?: 0
+            if (firstRoll == 10) {
+                strikes++
+                rollIndex += 1 // Strike moves to next frame
+            } else {
+                rollIndex += 2 // Non-strike consumes two rolls in a frame
+            }
+        }
+        return strikes
+    }
+
+    private fun calcSpares(rolls: List<Int?>): Int {
+        var spares = 0
+        var rollIndex = 0
+
+        for (frame in 1..10) {
+            if (rollIndex + 1 >= rolls.size) break
+
+            val firstRoll = rolls[rollIndex] ?: 0
+            if (firstRoll == 10) {
+                rollIndex += 1
+            } else {
+                val secondRoll = rolls[rollIndex + 1] ?: 0
+                if (firstRoll + secondRoll == 10) {
+                    spares++
+                }
+                rollIndex += 2
+            }
+        }
+        return spares
     }
 }

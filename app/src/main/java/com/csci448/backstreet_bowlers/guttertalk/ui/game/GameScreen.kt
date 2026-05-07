@@ -1,5 +1,6 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.game
 
+import android.R.attr.dialogTitle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +45,8 @@ import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberMaterialLoader
 import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberView
+import java.time.LocalDate
+import java.util.Date
 
 @Composable
 fun GutterTalkLaneScreen(
@@ -52,9 +55,10 @@ fun GutterTalkLaneScreen(
     physicsSnapshot: PhysicsSnapshot3D?,
     rolls: List<Int>,
     frame: Int,
-    onBack: () -> Unit,
-    onPlayAgain: () -> Unit
-) {
+    onBack: (BowlingScore) -> Unit,
+    onPlayAgain: (BowlingScore) -> Unit,
+
+    ) {
     val engine = rememberEngine()
     val engineView = rememberView(engine)
     val modelLoader = rememberModelLoader(engine)
@@ -77,9 +81,23 @@ fun GutterTalkLaneScreen(
     }
 
     if (frame == 11) {
+        // Update the user repo here
+        var scoreCard = BowlingScore(rolls = rolls)
+        val scores: MutableList<Int?> = mutableListOf()
+        repeat(10) { i ->
+            scores += (ScoreCalculator(scoreCard, i+1))
+        }
+        val gameStateEnd = BowlingScore(
+            PlayerID = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid!!,
+            rolls = rolls,
+            scores = scores,
+            frameNumber = 11,
+            score = scores[9],
+            datePlayed = Date()
+        )
         GamePlayAgainDialog(
-            onDismissRequest = onBack,
-            onConfirmation = onPlayAgain,
+            onDismissRequest = { onBack(gameStateEnd) },
+            onConfirmation = { onPlayAgain(gameStateEnd) },
             dialogTitle = stringResource(R.string.lane_dialog_title),
             dialogText = stringResource(R.string.lane_dialog_text)
         )

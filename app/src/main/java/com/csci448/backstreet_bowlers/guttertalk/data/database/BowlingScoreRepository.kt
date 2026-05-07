@@ -13,7 +13,13 @@ class BowlingScoreRepository(
     private val scoresCollection = firestore.collection("UserScores")
 
     suspend fun addScore(score: BowlingScore) {
-        scoresCollection.document(score.id).set(score).await()
+        scoresCollection.add(score)
+            .addOnSuccessListener { docRef ->
+                Log.d("Firestore", "Document added with ID: ${docRef.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error adding document", e)
+            }
     }
 
     suspend fun getScore(scoreId: String): BowlingScore? {
