@@ -49,28 +49,6 @@ class BowlingScoreRepository(
         }
 
         emit(scores)
-
-        // Replace with your actual collection and document IDs
-        /*
-val docRef = scoresCollection.document("IuZcpoSekHRKI7iXQ2fA3fl0Qwu2")
-
-docRef.get()
-    .addOnSuccessListener { document ->
-        if (document != null && document.exists()) {
-            // document.data returns a Map<String, Any>
-            val data = document.data
-            Log.d("Tag", "Document Data (Map format): $data")
-
-            // If you want it to look exactly like a JSON string in your logs:
-            // You could use a library like Gson or just print the map
-            Log.d("Tag", "Fields: ${data?.keys}")
-        } else {
-            Log.d("Tag", "No such document exists!")
-        }
-    }
-    .addOnFailureListener { exception ->
-        Log.e("Tag", "Error getting document: ", exception)
-    }*/
     }
 
     suspend fun updateScore(score: BowlingScore) {

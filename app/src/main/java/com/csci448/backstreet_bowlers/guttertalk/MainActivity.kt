@@ -23,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.csci448.backstreet_bowlers.guttertalk.ui.navigation.GutterTalkNavHost
 import com.csci448.backstreet_bowlers.guttertalk.ui.navigation.GutterTalkTopBar
 import com.csci448.backstreet_bowlers.guttertalk.ui.theme.GutterTalkTheme
+import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.GutterTalkViewModelFactory
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.LeaderboardViewModel
 import com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.intent.LeaderboardIntent
 import com.google.android.gms.location.LocationSettingsStates
@@ -37,7 +38,7 @@ class MainActivity : ComponentActivity() {
 //        private lateinit var _lastLocation: Location
 
     }
-    private val leaderboardViewModel: LeaderboardViewModel by viewModels()
+    private val leaderboardViewModel: LeaderboardViewModel by viewModels{GutterTalkViewModelFactory()}
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()

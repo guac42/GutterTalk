@@ -56,12 +56,17 @@ fun GutterTalkScoresScreen(
                 viewModel.loadUserInformation(userId)
             }
             1 -> viewModel.loadLeaderboard() // Loads global leaderboard
-            2 -> userLocation?.let { viewModel.loadLeaderboard(location = userStats?.country) }// Loads local leaderboard
+            2 -> userLocation?.let {
+                viewModel.loadLeaderboard(location = userStats?.country)
+                viewModel.loadUserInformation(userId)
+            }// Loads local leaderboard
         }
     }
 
     val userScores by viewModel.userScores.collectAsState()
     val topUsers by viewModel.topUsers.collectAsState()
+
+
 
     Log.d(LOG_TAG, "Collected userStats: ${userStats}")
     Log.d(LOG_TAG, "Screen index key is: $screen")
@@ -74,11 +79,11 @@ fun GutterTalkScoresScreen(
     } else if (screen == 1) {
         Log.d(LOG_TAG, "Should navigate to global")
         // Case: Global scoreboard
-        LeaderboardComposable(topUsers)
+        LeaderboardComposable(users = topUsers, userStats = userStats)
     } else {
         Log.d(LOG_TAG, "Should navigate to local")
         // Case: Local scoreboard
-        LeaderboardComposable(topUsers, true, userStats?.country)
+        LeaderboardComposable(topUsers, true, userStats?.country, userStats)
     }
 }
 

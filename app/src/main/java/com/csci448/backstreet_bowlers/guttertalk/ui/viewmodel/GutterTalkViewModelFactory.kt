@@ -58,7 +58,7 @@ class GutterTalkViewModelFactory : ViewModelProvider.Factory {
                     Log.d(LOG_TAG, "creating LoginViewModel")
                     val savedStateHandle = extras.createSavedStateHandle()
                 LeaderboardViewModel(savedStateHandle = savedStateHandle, application = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]
-                    ?: throw IllegalArgumentException("Application context is required"))
+                    ?: throw IllegalArgumentException("Application context is required"), userRepository = userRepository)
 
             }
 

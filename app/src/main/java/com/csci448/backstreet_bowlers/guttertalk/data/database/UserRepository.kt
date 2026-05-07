@@ -1,5 +1,6 @@
 package com.csci448.backstreet_bowlers.guttertalk.data.database
 
+import android.location.Location
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -9,7 +10,9 @@ import com.google.firebase.firestore.auth.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -18,7 +21,29 @@ class UserRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
     private val userCollection = firestore.collection("UserInformation")
-    var createUserRecord : Boolean = false
+
+    data class LocationState (
+        val location: Location? = null,
+        val city: String? = null,
+        val adminDistrict: String? = null,
+        val country: String? = null
+    )
+
+    private val _locationStateFlow = MutableStateFlow(LocationState())
+
+    fun setLocationState(userId: String, location: Location?, city: String, adminDistrict: String, country: String){
+        _locationStateFlow.update {
+            _locationStateFlow.value.copy(
+                location = location,
+                city = city,
+                adminDistrict = adminDistrict,
+                country = country
+            )
+        }
+        suspend {
+            updateUserLocation(userId = userId, city = city, adminDistrict = adminDistrict, country = country)
+        }
+    }
 
     suspend fun addUser(user: UserInformation) {
         userCollection.document(user.PlayerID).set(user).await()

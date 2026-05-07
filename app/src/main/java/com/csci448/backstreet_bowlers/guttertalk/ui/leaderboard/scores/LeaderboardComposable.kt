@@ -3,6 +3,7 @@ package com.csci448.backstreet_bowlers.guttertalk.ui.leaderboard.scores
 import android.R
 import android.R.attr.country
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,7 +39,7 @@ import com.csci448.backstreet_bowlers.guttertalk.data.database.UserInformation
 
 
 @Composable
-fun LeaderboardComposable(users: List<UserInformation>?, isLocal: Boolean = false, country:String? = null){
+fun LeaderboardComposable(users: List<UserInformation>?, isLocal: Boolean = false, country:String? = null, userStats: UserInformation?){
     Column(
         modifier = Modifier
             .padding(1.dp)
@@ -86,7 +87,7 @@ fun LeaderboardComposable(users: List<UserInformation>?, isLocal: Boolean = fals
                     }
                 }
                 usersList.sortByDescending { it.lifetimeScore }
-                GlobalLeaderboard(usersList, isLocal)
+                GlobalLeaderboard(usersList, isLocal, userStats)
             }
             // Local leaderboard
         }else {
@@ -136,25 +137,27 @@ fun LeaderboardComposable(users: List<UserInformation>?, isLocal: Boolean = fals
                     }
                 }
                 usersList.sortByDescending { it.lifetimeScore }
-                GlobalLeaderboard(usersList, isLocal)
+                GlobalLeaderboard(usersList, isLocal, userStats)
             }
         }
     }
 }
 @Composable
-fun GlobalLeaderboard(users: List<UserInformation>, isLocal: Boolean) {
+fun GlobalLeaderboard(users: List<UserInformation>, isLocal: Boolean, userStats: UserInformation?) {
     LazyColumn {
         items(users.size) { user ->
-            LeaderboardCard(user = users.get(user), isLocal = isLocal)
+            LeaderboardCard(user = users.get(user), isLocal = isLocal, rank = user, highlight = if(users.get(user).PlayerID == userStats?.PlayerID)true else false)
         }
     }
 }
 
 @Composable
-fun LeaderboardCard(user: UserInformation, isLocal:Boolean) {
+fun LeaderboardCard(user: UserInformation, isLocal:Boolean, rank:Int, highlight:Boolean = false) {
     // Local state to track if this specific card is expanded
     var isExpanded by remember { mutableStateOf(false) }
 
+    var mod = CardDefaults.cardColors(containerColor = Color.LightGray)
+    if(highlight) mod = CardDefaults.cardColors(containerColor = Color.hsl(45.0F,1F,.435F))
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -162,7 +165,7 @@ fun LeaderboardCard(user: UserInformation, isLocal:Boolean) {
             .animateContentSize()
             .clickable { isExpanded = !isExpanded }, // Toggle state on click
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.LightGray)
+        colors = mod
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // Basic leaderboard info
@@ -181,11 +184,18 @@ fun LeaderboardCard(user: UserInformation, isLocal:Boolean) {
                     Text(text = user.username, style = MaterialTheme.typography.titleLarge)
                     Text(text = location ?: "Unknown Location", style = MaterialTheme.typography.bodySmall)
                 }
-                Text(
-                    text = "${user.lifetimeScore}",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
+                Column {
+                    Text(
+                        text = "Rank ${rank+1}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Normal
+                    )
+                    Text(
+                        text = "${user.lifetimeScore}",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
 
             // Extra statistics
@@ -215,20 +225,20 @@ fun StatItem(label: String, value: Int) {
 @Preview(showBackground = true, name = "Full Leaderboard")
 @Composable
 fun PreviewLeaderboard() {
-    LeaderboardComposable(users = MockDataGlobal.userList)
+    LeaderboardComposable(users = MockDataGlobal.userList, userStats = MockDataGlobal.user2)
 }
 
 @Preview(showBackground = true, name = "Buffering Leaderboard")
 @Composable
 fun PreviewBufferingLeaderboard() {
-    LeaderboardComposable(users = null)
+    LeaderboardComposable(users = null, userStats = MockDataGlobal.user1)
 }
 
-@Preview(showBackground = true, name = "Single Card Detail")
-@Composable
-fun PreviewSingleCard() {
-    LeaderboardCard(user = MockDataGlobal.user1, false)
-}
+//@Preview(showBackground = true, name = "Single Card Detail")
+//@Composable
+//fun PreviewSingleCard() {
+//    LeaderboardCard(user = MockDataGlobal.user1, false)
+//}
 
 object MockDataGlobal {
     val user1 = UserInformation(
