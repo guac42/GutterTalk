@@ -1,7 +1,11 @@
 package com.csci448.backstreet_bowlers.guttertalk.ui.viewmodel.intent
 
 sealed class GameIntent : GutterTalkIntent() {
-    data object ThrowBall : GameIntent()
+    data class ThrowBall(
+        val swipeVelocityX: Double,
+        val swipeVelocityZ: Double,
+        val swipeSpin: Double
+    ) : GameIntent()
     data object ResetPins : GameIntent()
 
     /**
